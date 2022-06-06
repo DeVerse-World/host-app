@@ -1,7 +1,7 @@
-import 'package:deverse_host_app/data/models/DLevel.dart';
 import 'package:deverse_host_app/ui/home/home_model.dart';
 import 'package:deverse_host_app/ui/session_manager/session_manager_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -19,7 +19,32 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _model.initData();
+    Provider.of<HomeModel>(context, listen: false).initData();
+  }
+
+  Widget _buildLevelTable(HomeModel model) {
+    return DataTable(
+        columns: [
+          DataColumn(label:
+          Checkbox(value: model.isAllSelected, onChanged: (isChecked) {
+            model.onToggleAllLevel(isChecked ?? false);
+          })),
+          const DataColumn(label: const Text("Name")),
+        ],
+        rows: model.verseLevels.map((level) {
+          return DataRow(cells: [
+            DataCell(Checkbox(
+              value: model.isLevelSelected(level),
+              onChanged: (isChecked) {
+                model.onToggleSelection(level, isChecked ?? false);
+              },
+            )),
+            DataCell(Text(level.name))
+          ]);
+        }).toList()
+        // DataCell(Text("1")),
+        // DataCell(Text("Awesome world")),
+        );
   }
 
   @override
@@ -33,30 +58,22 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text("Select your level"),
+              const Text("Select your levels"),
               SizedBox(
                 width: 200,
                 child: Consumer<HomeModel>(
                   builder: (context, model, child) {
-                    return DropdownButton<DLevel>(
-                        isExpanded: true,
-                        hint: const Text("Tap to select..."),
-                        value: _model.selectedLevel,
-                        items: model.verseLevels.map((level) => DropdownMenuItem(value: level, child: Text(level.name))).toList(),
-                        onChanged: (newValue) {
-                          if (newValue != null) {
-                            _model.selectLevel(newValue);
-                          }
-                        });
+                    return _buildLevelTable(model);
                   },
                 ),
               ),
-              MaterialButton(
+              ElevatedButton(
                 onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => SessionManagerScreen(levels: _model.verseLevels)));
+                  if (_model.selectedLevels.isEmpty) {
+                    return;
+                  }
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => SessionManagerScreen(levels: _model.selectedLevels)));
                 },
-                color: Theme.of(context).primaryColor,
-                textColor: Colors.white,
                 child: const Text("Move on"),
               )
             ],

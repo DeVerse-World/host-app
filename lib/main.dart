@@ -6,6 +6,7 @@ import 'package:deverse_host_app/ui/session_manager/session_manager_model.dart';
 import 'package:deverse_host_app/ui/session_manager/session_manager_screen.dart';
 import 'package:deverse_host_app/ui/settings/settings_model.dart';
 import 'package:deverse_host_app/ui/settings/settings_screen.dart';
+import 'package:deverse_host_app/utils/app_theme.dart';
 import 'package:deverse_host_app/utils/injection_container.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -25,22 +26,6 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  ThemeData _getAppTheme() {
-    return ThemeData(
-        primaryColor: Colors.lightBlueAccent,
-        primaryIconTheme: const IconThemeData(
-          color: Colors.lightBlueAccent,
-        ),
-        iconTheme: const IconThemeData(
-          color: Colors.lightBlueAccent,
-        ),
-        appBarTheme: const AppBarTheme(backgroundColor: Colors.lightBlueAccent),
-        drawerTheme: const DrawerThemeData(),
-        buttonTheme: const ButtonThemeData(
-            buttonColor: Colors.lightBlueAccent,
-        ));
-  }
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -52,7 +37,7 @@ class MyApp extends StatelessWidget {
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
-          theme: _getAppTheme(),
+          theme: AppTheme.getTheme(),
           routes: {SessionManagerScreen.route: (context) => const SessionManagerScreen(levels: []), SettingsScreen.route: (context) => const SettingsScreen()},
           home: const HomeScreen(),
         ));
