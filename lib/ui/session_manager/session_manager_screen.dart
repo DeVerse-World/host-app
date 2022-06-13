@@ -1,12 +1,14 @@
-import 'package:deverse_host_app/data/models/DLevel.dart';
+import 'package:deverse_host_app/data/models/sub_world_config.dart';
+import 'package:deverse_host_app/data/models/sub_world_theme.dart';
 import 'package:deverse_host_app/ui/session_manager/session_manager_model.dart';
+import 'package:deverse_host_app/ui/session_manager/sub_world_config_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class SessionManagerScreen extends StatefulWidget {
   const SessionManagerScreen({Key? key, required this.levels}) : super(key: key);
   static const route = '/gameManager';
-  final List<DLevel> levels;
+  final List<SubWorldTheme> levels;
 
   @override
   State createState() => _SessionManagerScreenState();
@@ -21,6 +23,8 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
   TextEditingController _playerCountController = TextEditingController();
   TextEditingController _portController = TextEditingController(text: "7777");
   TextEditingController _beaconController = TextEditingController(text: "7877");
+
+
 
   @override
   void initState() {
@@ -39,7 +43,7 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
                 Container(
                   width: 300.0,
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
@@ -49,18 +53,29 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
                       const Text("Select your level"),
                       Consumer<SessionManagerModel>(
                         builder: (context, model, child) {
-                          return DropdownButton<DLevel>(
+                          return DropdownButton<SubWorldTheme>(
                               isExpanded: true,
                               hint: const Text("Tap to select..."),
                               value: _model.selectedLevel,
-                              items: widget.levels.map((level) => DropdownMenuItem(value: level, child: Text(level.name))).toList(),
+                              items: widget.levels.map((level) => DropdownMenuItem(value: level, child: Text(level.file_name))).toList(),
                               onChanged: (newValue) {
                                 if (newValue != null) {
                                   _model.onSelectLevel(newValue);
                                 }
                               });
                         },
-                      )
+                      ),
+                      Consumer<SessionManagerModel>(builder: (context, model, child) {
+                        return Container(
+                          color: Colors.white,
+                          height: 100,
+                          child: SubWorldConfigManagerView(data: model.savedConfigs, onApply: (item) {
+
+                          }, onDelete: (item) {
+
+                          })
+                        ) ;
+                      })
                     ],
                   ),
                 ),
@@ -74,7 +89,8 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
                       const SizedBox(height: 8),
                       TextField(
                         controller: _vernameController,
-                        decoration: const InputDecoration(hintText: "e.g: My awesome verse", border: OutlineInputBorder()),
+                        decoration: const InputDecoration(hintText: "e.g: My awesome verse",
+                            border: OutlineInputBorder()),
                       ),
                       const SizedBox(height: 36),
                       const Text("Max player count"),
@@ -84,7 +100,6 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
                         keyboardType: TextInputType.number,
                         decoration: const InputDecoration(hintText: "e.g: 10", border: OutlineInputBorder()),
                       ),
-
                     ],
                   ),
                 ),

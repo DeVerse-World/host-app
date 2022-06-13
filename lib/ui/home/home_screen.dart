@@ -1,7 +1,6 @@
 import 'package:deverse_host_app/ui/home/home_model.dart';
 import 'package:deverse_host_app/ui/session_manager/session_manager_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -25,11 +24,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildLevelTable(HomeModel model) {
     return DataTable(
         columns: [
-          DataColumn(label:
+          DataColumn(
+              label:
           Checkbox(value: model.isAllSelected, onChanged: (isChecked) {
             model.onToggleAllLevel(isChecked ?? false);
           })),
-          const DataColumn(label: const Text("Name")),
+          const DataColumn(label: Text("Name")),
         ],
         rows: model.verseLevels.map((level) {
           return DataRow(cells: [
@@ -39,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 model.onToggleSelection(level, isChecked ?? false);
               },
             )),
-            DataCell(Text(level.name))
+            DataCell(Text(level.display_name))
           ]);
         }).toList()
         // DataCell(Text("1")),

@@ -12,6 +12,10 @@ class AppTheme {
       ),
       appBarTheme: const AppBarTheme(backgroundColor: Colors.lightBlueAccent),
       drawerTheme: const DrawerThemeData(),
+      inputDecorationTheme: const InputDecorationTheme(
+        filled: true,
+        fillColor: Colors.white
+      )
       // textButtonTheme: TextButtonThemeData(
       //     style: ButtonStyle(
       //         backgroundColor: MaterialStateProperty.resolveWith(_resolveColor),

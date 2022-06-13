@@ -17,7 +17,7 @@ void main() async {
   await initDIContainer();
   // await EasyLocalization.ensureInitialized();
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-    setWindowMinSize(const Size(800, 600));
+    setWindowMinSize(const Size(1200, 700));
     // setWindowMaxSize(const Size(800, 800));
   }
   runApp(const MyApp());

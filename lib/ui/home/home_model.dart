@@ -1,14 +1,15 @@
-import 'package:deverse_host_app/data/models/DLevel.dart';
+import 'package:deverse_host_app/data/models/sub_world_theme.dart';
 import 'package:flutter/material.dart';
 
 class HomeModel extends ChangeNotifier {
-  List<DLevel> verseLevels = [];
-  List<DLevel> selectedLevels = [];
+  List<SubWorldTheme> verseLevels = [];
+  List<SubWorldTheme> selectedLevels = [];
+
   void initData() {
     verseLevels = [
-      DLevel(1, "Blizzard"),
-      DLevel(2, "Inferno"),
-      DLevel(3, "Dungeon"),
+      SubWorldTheme(1, "Blizzard", "Blizzard", "", "", 0, 0),
+      SubWorldTheme(2, "Inferno", "Inferno", "", "", 0, 0),
+      SubWorldTheme(3, "Dungeon", "Dungeon", "", "", 0, 0),
     ];
   }
 
@@ -16,11 +17,11 @@ class HomeModel extends ChangeNotifier {
     return verseLevels.length == selectedLevels.length;
   }
 
-  bool isLevelSelected(DLevel level) {
+  bool isLevelSelected(SubWorldTheme level) {
     return selectedLevels.contains(level);
   }
 
-  void onToggleSelection(DLevel newLevel, bool isSelected) {
+  void onToggleSelection(SubWorldTheme newLevel, bool isSelected) {
     if (isSelected) {
       selectedLevels.add(newLevel);
     } else {
@@ -38,7 +39,7 @@ class HomeModel extends ChangeNotifier {
     }
     notifyListeners();
   }
-  // void selectLevel(DLevel newLevel) {
-  //   notifyListeners();
-  // }
+// void selectLevel(DLevel newLevel) {
+//   notifyListeners();
+// }
 }
