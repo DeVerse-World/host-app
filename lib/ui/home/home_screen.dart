@@ -1,3 +1,4 @@
+import 'package:deverse_host_app/data/models/sub_world_template.dart';
 import 'package:deverse_host_app/ui/home/home_model.dart';
 import 'package:deverse_host_app/ui/session_manager/session_manager_screen.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  SubWorldTemplate? _selectedTemplate;
+
   HomeModel get _model {
     return Provider.of<HomeModel>(context, listen: false);
   }
@@ -21,30 +24,21 @@ class _HomeScreenState extends State<HomeScreen> {
     Provider.of<HomeModel>(context, listen: false).initData();
   }
 
-  Widget _buildLevelTable(HomeModel model) {
-    return DataTable(
-        columns: [
-          DataColumn(
-              label:
-          Checkbox(value: model.isAllSelected, onChanged: (isChecked) {
-            model.onToggleAllLevel(isChecked ?? false);
-          })),
-          const DataColumn(label: Text("Name")),
-        ],
-        rows: model.verseLevels.map((level) {
-          return DataRow(cells: [
-            DataCell(Checkbox(
-              value: model.isLevelSelected(level),
-              onChanged: (isChecked) {
-                model.onToggleSelection(level, isChecked ?? false);
-              },
-            )),
-            DataCell(Text(level.display_name))
-          ]);
-        }).toList()
-        // DataCell(Text("1")),
-        // DataCell(Text("Awesome world")),
-        );
+  Widget _buildTemplateList(List<SubWorldTemplate> templates) {
+    return Column(
+      children: templates
+          .map((template) => RadioListTile<SubWorldTemplate>(
+                title: Text(template.display_name),
+                value: template,
+                groupValue: _selectedTemplate,
+                onChanged: (value) {
+                  setState(() {
+                    _selectedTemplate = value;
+                  });
+                },
+              ))
+          .toList(),
+    );
   }
 
   @override
@@ -63,16 +57,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: 200,
                 child: Consumer<HomeModel>(
                   builder: (context, model, child) {
-                    return _buildLevelTable(model);
+                    return _buildTemplateList(model.templates);
                   },
                 ),
               ),
               ElevatedButton(
                 onPressed: () {
-                  if (_model.selectedLevels.isEmpty) {
-                    return;
+                  if (_selectedTemplate != null) {
+                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => SessionManagerScreen(rootTemplate: _selectedTemplate!)));
                   }
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => SessionManagerScreen(levels: _model.selectedLevels)));
                 },
                 child: const Text("Move on"),
               )

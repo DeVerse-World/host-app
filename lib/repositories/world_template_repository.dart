@@ -10,4 +10,9 @@ class WorldTemplateRepository {
     var res = await _subWorldService.getRootSubWorlds(null);
     return res.data?.subworld_templates ?? [];
   }
+
+  Future<List<SubWorldTemplate>> getSubTemplates(SubWorldTemplate rootTemplate) async {
+    var res = await _subWorldService.getSubSubWorlds(null, rootTemplate.id);
+    return res.data?.subworld_templates ?? [];
+  }
 }

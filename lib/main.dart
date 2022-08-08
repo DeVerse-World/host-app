@@ -38,7 +38,9 @@ class MyApp extends StatelessWidget {
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
           theme: AppTheme.getTheme(),
-          routes: {SessionManagerScreen.route: (context) => const SessionManagerScreen(levels: []), SettingsScreen.route: (context) => const SettingsScreen()},
+          routes: {
+            SessionManagerScreen.route: (context) => const SessionManagerScreen(rootTemplate: null),
+            SettingsScreen.route: (context) => const SettingsScreen()},
           home: const HomeScreen(),
         ));
   }

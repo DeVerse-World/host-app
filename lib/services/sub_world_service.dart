@@ -21,4 +21,17 @@ class SubWorldService extends BaseService {
       return data;
     });
   }
+
+  Future<Result<SubWorldTemplateData, Exception>> getSubSubWorlds(int? userId, int rootId) async {
+    var uri = "$baseUrl/subworld/root_template/$rootId/deriv";
+    if (userId != null) {
+      uri = "$uri?userId=$userId";
+    }
+    return getResult(() async {
+      var res = await http.get(Uri.parse(uri));
+      final response = parse(res);
+      var data = SubWorldTemplateData.fromJson(response.data);
+      return data;
+    });
+  }
 }

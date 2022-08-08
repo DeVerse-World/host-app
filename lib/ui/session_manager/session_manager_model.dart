@@ -1,13 +1,22 @@
+import 'package:deverse_host_app/data/models/sub_world_template.dart';
 import 'package:deverse_host_app/data/models/sub_world_theme.dart';
 import 'package:deverse_host_app/data/models/sub_world_config.dart';
+import 'package:deverse_host_app/repositories/world_template_repository.dart';
+import 'package:deverse_host_app/utils/injection_container.dart';
 import 'package:flutter/material.dart';
 
 class SessionManagerModel extends ChangeNotifier {
+  List<SubWorldTemplate> templates = [];
+  final WorldTemplateRepository _worldTemplateRepository = container<WorldTemplateRepository>();
   List<SubWorldConfig> savedConfigs = [];
+  SubWorldTemplate? selectedTemplate;
 
-  SubWorldTheme? selectedLevel;
-  void initData() {
-    selectedLevel = null;
+  void initData(SubWorldTemplate rootTemplate) {
+    _worldTemplateRepository.getSubTemplates(rootTemplate).then((value) {
+      templates = value;
+      notifyListeners();
+    });
+    selectedTemplate = null;
     savedConfigs = [
       SubWorldConfig(1, SubWorldTheme(1, "Blizzard", "", "", "", 0, 0), "Nam", 8, 7777, 7877),
       SubWorldConfig(2, SubWorldTheme(2, "Inferno", "", "", "", 0, 0), "Hieu", 18, 7777, 7877),
@@ -24,8 +33,8 @@ class SessionManagerModel extends ChangeNotifier {
     ];
   }
 
-  void onSelectLevel(SubWorldTheme newLevel) {
-    selectedLevel = newLevel;
+  void onSelectTemplate(SubWorldTemplate template) {
+    selectedTemplate = template;
     notifyListeners();
   }
 

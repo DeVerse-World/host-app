@@ -1,4 +1,5 @@
 import 'package:deverse_host_app/data/models/sub_world_config.dart';
+import 'package:deverse_host_app/data/models/sub_world_template.dart';
 import 'package:deverse_host_app/data/models/sub_world_theme.dart';
 import 'package:deverse_host_app/ui/session_manager/session_manager_model.dart';
 import 'package:deverse_host_app/ui/session_manager/sub_world_config_manager.dart';
@@ -6,9 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class SessionManagerScreen extends StatefulWidget {
-  const SessionManagerScreen({Key? key, required this.levels}) : super(key: key);
+  const SessionManagerScreen({Key? key, required this.rootTemplate}) : super(key: key);
   static const route = '/gameManager';
-  final List<SubWorldTheme> levels;
+  final SubWorldTemplate? rootTemplate;
 
   @override
   State createState() => _SessionManagerScreenState();
@@ -29,7 +30,7 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
   @override
   void initState() {
     super.initState();
-    _model.initData();
+    _model.initData(widget.rootTemplate!);
   }
 
   @override
@@ -53,14 +54,14 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
                       const Text("Select your level"),
                       Consumer<SessionManagerModel>(
                         builder: (context, model, child) {
-                          return DropdownButton<SubWorldTheme>(
+                          return DropdownButton<SubWorldTemplate>(
                               isExpanded: true,
                               hint: const Text("Tap to select..."),
-                              value: _model.selectedLevel,
-                              items: widget.levels.map((level) => DropdownMenuItem(value: level, child: Text(level.file_name))).toList(),
+                              value: _model.selectedTemplate,
+                              items: model.templates.map((template) => DropdownMenuItem(value: template, child: Text(template.display_name))).toList(),
                               onChanged: (newValue) {
                                 if (newValue != null) {
-                                  _model.onSelectLevel(newValue);
+                                  _model.onSelectTemplate(newValue);
                                 }
                               });
                         },
