@@ -52,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text("Select your levels"),
+              const Text("Select original subworld theme"),
               SizedBox(
                 width: 200,
                 child: Consumer<HomeModel>(

@@ -6,20 +6,6 @@ part of 'sub_world_template.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-SubWorldTemplateData _$SubWorldTemplateDataFromJson(
-        Map<String, dynamic> json) =>
-    SubWorldTemplateData(
-      (json['subworld_templates'] as List<dynamic>)
-          .map((e) => SubWorldTemplate.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
-
-Map<String, dynamic> _$SubWorldTemplateDataToJson(
-        SubWorldTemplateData instance) =>
-    <String, dynamic>{
-      'subworld_templates': instance.subworld_templates,
-    };
-
 SubWorldTemplate _$SubWorldTemplateFromJson(Map<String, dynamic> json) =>
     SubWorldTemplate(
       json['id'] as int,

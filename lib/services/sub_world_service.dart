@@ -1,16 +1,17 @@
 import 'dart:convert';
 
-import 'package:deverse_host_app/data/models/result.dart';
+import 'package:deverse_host_app/data/api/result.dart';
+import 'package:deverse_host_app/data/models/world_instance_config.dart';
 import 'package:http/http.dart' as http;
 
-import '../data/models/sub_world_template.dart';
+import '../data/api/request_body.dart';
 import 'base_service.dart';
 
 class SubWorldService extends BaseService {
-  final baseUrl = "https://api.staging.deverse.world/api";
+  final _baseUrl = "https://api.staging.deverse.world/api/subworld";
 
   Future<Result<SubWorldTemplateData, Exception>> getRootSubWorlds(int? userId) async {
-    var uri = "$baseUrl/subworld/root_template";
+    var uri = "$_baseUrl/root_template";
     if (userId != null) {
       uri = "$uri?userId=$userId";
     }
@@ -23,7 +24,7 @@ class SubWorldService extends BaseService {
   }
 
   Future<Result<SubWorldTemplateData, Exception>> getSubSubWorlds(int? userId, int rootId) async {
-    var uri = "$baseUrl/subworld/root_template/$rootId/deriv";
+    var uri = "$_baseUrl/root_template/$rootId/deriv";
     if (userId != null) {
       uri = "$uri?userId=$userId";
     }
@@ -32,6 +33,39 @@ class SubWorldService extends BaseService {
       final response = parse(res);
       var data = SubWorldTemplateData.fromJson(response.data);
       return data;
+    });
+  }
+
+  Future<Result<SubWorldInstancesData, Exception>> fetchInstances(int? userId) async {
+    var uri = "$_baseUrl/instance";
+    if (userId != null) {
+      uri = "$uri?userId=$userId";
+    }
+    return getResult(() async {
+      var res = await http.get(Uri.parse(uri));
+      final response = parse(res);
+      var data = SubWorldInstancesData.fromJson(response.data);
+      return data;
+    });
+  }
+
+  Future<Result<SubWorldInstanceData, Exception>> createInstance(WorldInstanceConfig config) async {
+    var uri = "$_baseUrl/instance";
+    var requestBody = SubWorldRequest(config);
+    return getResult(() async {
+      var res = await http.post(Uri.parse(uri), headers: header, body: json.encode(requestBody.toJson()));
+      final response = parse(res);
+      var data = SubWorldInstanceData.fromJson(response.data);
+      return data;
+    });
+  }
+
+  Future<Result<String, Exception>> removeInstance(int subworldId) async {
+    var uri = "$_baseUrl/instance/$int";
+    return getResult(() async {
+      var res = await http.delete(Uri.parse(uri), headers: header);
+      final response = parse(res);
+      return response.message;
     });
   }
 }

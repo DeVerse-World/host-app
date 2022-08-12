@@ -14,12 +14,12 @@ import 'package:window_size/window_size.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initDIContainer();
-  // await EasyLocalization.ensureInitialized();
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     setWindowMinSize(const Size(1200, 700));
     // setWindowMaxSize(const Size(800, 800));
   }
+  await initDIContainer();
+  // await EasyLocalization.ensureInitialized();
   runApp(const MyApp());
 }
 

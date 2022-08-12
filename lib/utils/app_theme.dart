@@ -15,6 +15,9 @@ class AppTheme {
       inputDecorationTheme: const InputDecorationTheme(
         filled: true,
         fillColor: Colors.white
+      ),
+      scrollbarTheme: ScrollbarThemeData(
+        thumbVisibility: MaterialStateProperty.all<bool>(true)
       )
       // textButtonTheme: TextButtonThemeData(
       //     style: ButtonStyle(

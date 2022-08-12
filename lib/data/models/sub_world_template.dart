@@ -2,16 +2,6 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'sub_world_template.g.dart';
 
-@JsonSerializable()
-class SubWorldTemplateData {
-  List<SubWorldTemplate> subworld_templates = [];
-
-  SubWorldTemplateData(this.subworld_templates);
-
-  factory SubWorldTemplateData.fromJson(Map<String, dynamic> json) =>_$SubWorldTemplateDataFromJson(json);
-
-  Map<String, dynamic> toJson() => _$SubWorldTemplateDataToJson(this);
-}
 
 @JsonSerializable()
 class SubWorldTemplate {
