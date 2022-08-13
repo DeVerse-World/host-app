@@ -11,10 +11,10 @@ class UserRepository {
   //https://staging.deverse.world/login?key=OwGpDJHRbb
   UserRepository(this._userService, this._authService);
 
-  Future<Result<PollLoginResponse?, Exception>> authenticateSession() {
+  Future<Result<PollLoginResponse?, Exception>> authenticateSession(bool forceReload) {
     return getResult(() async {
       var loginKey = await _userService.getLoginKey();
-      if (loginKey == null) {
+      if (loginKey == null || forceReload) {
         print("No login key cached, creating link...");
         var loginUrl = await _userService.createLoginLink();
         var loginUri = Uri.parse(loginUrl);

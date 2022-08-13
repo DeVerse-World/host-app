@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:deverse_host_app/data/api/result.dart';
+import 'package:deverse_host_app/data/db/app_storage.dart';
 import 'package:deverse_host_app/data/models/world_instance_config.dart';
+import 'package:deverse_host_app/utils/constants.dart';
 import 'package:http/http.dart' as http;
 
 import '../data/api/request_body.dart';
@@ -10,6 +12,8 @@ import 'base_service.dart';
 class SubWorldService extends BaseService {
   final _baseUrl = "https://api.staging.deverse.world/api/subworld";
 
+  final AppStorage _appStorage;
+  SubWorldService(this._appStorage);
   Future<Result<SubWorldTemplateData, Exception>> getRootSubWorlds(int? userId) async {
     var uri = "$_baseUrl/root_template";
     if (userId != null) {
@@ -52,8 +56,9 @@ class SubWorldService extends BaseService {
   Future<Result<SubWorldInstanceData, Exception>> createInstance(WorldInstanceConfig config) async {
     var uri = "$_baseUrl/instance";
     var requestBody = SubWorldRequest(config);
+    var cookie = await _appStorage.get<String>(Constants.COOKIE);
     return getResult(() async {
-      var res = await http.post(Uri.parse(uri), headers: header, body: json.encode(requestBody.toJson()));
+      var res = await http.post(Uri.parse(uri), headers: generateHeader(cookie ?? ""), body: json.encode(requestBody.toJson()));
       final response = parse(res);
       var data = SubWorldInstanceData.fromJson(response.data);
       return data;
@@ -61,9 +66,10 @@ class SubWorldService extends BaseService {
   }
 
   Future<Result<String, Exception>> removeInstance(int subworldId) async {
-    var uri = "$_baseUrl/instance/$int";
+    var uri = "$_baseUrl/instance/$subworldId";
+    var cookie = await _appStorage.get<String>(Constants.COOKIE);
     return getResult(() async {
-      var res = await http.delete(Uri.parse(uri), headers: header);
+      var res = await http.delete(Uri.parse(uri), headers: generateHeader(cookie ?? ""));
       final response = parse(res);
       return response.message;
     });

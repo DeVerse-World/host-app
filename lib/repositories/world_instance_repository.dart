@@ -24,8 +24,10 @@ class WorldInstanceRepository {
     });
   }
 
-  Future<String?> deleteInstance(SubWorldInstance subWorldInstance) async {
-    var res = await _subWorldService.removeInstance(subWorldInstance.id);
-    return res.data;
+  Future<Result<String?, Exception>> deleteInstance(SubWorldInstance subWorldInstance) async {
+    return getResult(() async {
+      var res = await _subWorldService.removeInstance(subWorldInstance.id);
+      return res.data;
+    });
   }
 }

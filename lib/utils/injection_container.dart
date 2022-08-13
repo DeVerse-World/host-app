@@ -16,7 +16,7 @@ Future<void> initDIContainer() async {
   // container.registerSingleton(UserChannel());
   container.registerSingleton(AppService());
   container.registerSingleton(AuthService());
-  container.registerSingleton(SubWorldService());
+  container.registerSingleton(SubWorldService(container()));
   container.registerSingleton(UserService(container()));
 
   container.registerSingleton(WorldTemplateRepository(container()));

@@ -57,7 +57,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: 200,
                 child: Consumer<HomeModel>(
                   builder: (context, model, child) {
-                    return _buildTemplateList(model.templates);
+                    if (model.isAuthenticated) {
+                      return _buildTemplateList(model.templates);
+                    }
+                    return Text("Please login first");
                   },
                 ),
               ),
@@ -68,7 +71,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   }
                 },
                 child: const Text("Move on"),
-              )
+              ),
+              SizedBox(height: 20,),
+              ElevatedButton(
+                  onPressed: () {
+                    _model.reAuthenticate();
+                  },
+                  child: const Text("Invalidate"))
             ],
           ),
         ));

@@ -6,15 +6,10 @@ import '../data/api/request_body.dart';
 
 class BaseService {
 
-  var cachedCookie = "";
-
-  Map<String, String> get header => {
-    'Cookie' : "deverse-jwt=$cachedCookie"
+  Map<String, String> generateHeader(String cachedCookie) => {
+    'Cookie' : cachedCookie,
+    'Content-type': "application/json",
   };
-
-  void setCookie(String cookie) {
-    cachedCookie = cookie;
-  }
 
   DResponse parse(Response response) {
     var data = DResponse.fromJson(json.decode(utf8.decode(response.bodyBytes)));

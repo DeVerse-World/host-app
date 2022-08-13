@@ -62,6 +62,11 @@ class SessionManagerModel extends ChangeNotifier {
   }
 
   void onDeleteVerse(SubWorldInstance subWorldInstance) {
-    _worldInstanceRepository.deleteInstance(subWorldInstance).then((value) {});
+    _worldInstanceRepository.deleteInstance(subWorldInstance).then((value) {
+      if (value.isSuccess) {
+        instances.removeWhere((element) => element.id == subWorldInstance.id);
+        notifyListeners();
+      }
+    });
   }
 }

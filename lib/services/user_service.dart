@@ -24,7 +24,8 @@ class UserService extends BaseService {
     var uri = "$_baseUrl/pollLoginLink/$key";
     var response = await http.get(Uri.parse(uri));
     if (response.headers['set-cookie'] != null) {
-      setCookie(response.headers['set-cookie']!);
+      var cookieString = response.headers['set-cookie']!.replaceAll(";", "").split(" ");
+      saveCookie(cookieString.elementAt(0));
     }
     var data = PollLoginResponse.fromJson(json.decode(utf8.decode(response.bodyBytes)));
     return data;
@@ -32,6 +33,10 @@ class UserService extends BaseService {
 
   void saveLoginKey(String key) {
     _appStorage.save("loginKey", key);
+  }
+
+  void saveCookie(String cookie) {
+    _appStorage.save("cookie", cookie);
   }
 
   Future<String?> getLoginKey() async {
