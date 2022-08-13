@@ -1,45 +1,38 @@
-import 'package:deverse_host_app/data/models/sub_world_theme.dart';
+import 'package:deverse_host_app/repositories/user_repository.dart';
 import 'package:flutter/material.dart';
 
+import '../../data/models/sub_world_template.dart';
+import '../../repositories/world_template_repository.dart';
+import '../../utils/injection_container.dart';
+
 class HomeModel extends ChangeNotifier {
-  List<SubWorldTheme> verseLevels = [];
-  List<SubWorldTheme> selectedLevels = [];
-
+  List<SubWorldTemplate> templates = [];
+  bool isAuthenticated = false;
+  final WorldTemplateRepository _worldTemplateRepository = container<WorldTemplateRepository>();
+  final UserRepository _userRepository = container<UserRepository>();
   void initData() {
-    verseLevels = [
-      SubWorldTheme(1, "Blizzard", "Blizzard", "", "", 0, 0),
-      SubWorldTheme(2, "Inferno", "Inferno", "", "", 0, 0),
-      SubWorldTheme(3, "Dungeon", "Dungeon", "", "", 0, 0),
-    ];
-  }
-
-  bool get isAllSelected {
-    return verseLevels.length == selectedLevels.length;
-  }
-
-  bool isLevelSelected(SubWorldTheme level) {
-    return selectedLevels.contains(level);
-  }
-
-  void onToggleSelection(SubWorldTheme newLevel, bool isSelected) {
-    if (isSelected) {
-      selectedLevels.add(newLevel);
-    } else {
-      selectedLevels.remove(newLevel);
-    }
-    notifyListeners();
-  }
-
-  void onToggleAllLevel(bool isSelected) {
-    selectedLevels = [];
-    if (isSelected) {
-      for (var element in verseLevels) {
-        selectedLevels.add(element);
+    _userRepository.authenticateSession(false).then((value) {
+      print(value.data?.wallet_address);
+      if (value.data != null) {
+        isAuthenticated = true;
+        notifyListeners();
       }
-    }
-    notifyListeners();
+    });
+    _worldTemplateRepository.getRootTemplates().then((value) {
+      templates = value;
+      notifyListeners();
+    });
   }
-// void selectLevel(DLevel newLevel) {
-//   notifyListeners();
-// }
+
+  void reAuthenticate() {
+    isAuthenticated = false;
+    notifyListeners();
+    _userRepository.authenticateSession(true).then((value) {
+      if (value.data != null) {
+        isAuthenticated = true;
+        notifyListeners();
+      }
+      print(value.data?.wallet_address);
+    });
+  }
 }
