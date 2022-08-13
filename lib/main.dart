@@ -1,11 +1,23 @@
-import 'package:deverse_host_app/ui/home_screen.dart';
-import 'package:deverse_host_app/ui/setup/setup_model.dart';
+import 'dart:io';
+
+import 'package:deverse_host_app/ui/home/home_model.dart';
+import 'package:deverse_host_app/ui/home/home_screen.dart';
+import 'package:deverse_host_app/ui/session_manager/session_manager_model.dart';
+import 'package:deverse_host_app/ui/session_manager/session_manager_screen.dart';
+import 'package:deverse_host_app/ui/settings/settings_model.dart';
+import 'package:deverse_host_app/ui/settings/settings_screen.dart';
+import 'package:deverse_host_app/utils/app_theme.dart';
 import 'package:deverse_host_app/utils/injection_container.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:window_size/window_size.dart';
 
 void main() async {
-  // WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    setWindowMinSize(const Size(1200, 700));
+    // setWindowMaxSize(const Size(800, 800));
+  }
   await initDIContainer();
   // await EasyLocalization.ensureInitialized();
   runApp(const MyApp());
@@ -14,34 +26,22 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  ThemeData _getAppTheme() {
-    return ThemeData(
-        primaryColor: Colors.lightBlueAccent,
-        primaryIconTheme: const IconThemeData(
-          color: Colors.lightBlueAccent,
-        ),
-        iconTheme: const IconThemeData(
-          color: Colors.lightBlueAccent,
-        ),
-        appBarTheme: AppBarTheme(backgroundColor: Colors.lightBlueAccent),
-        drawerTheme: DrawerThemeData()
-    );
-  }
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
         providers: [
-          ChangeNotifierProvider(create: (context) => SetupModel()),
+          ChangeNotifierProvider(create: (context) => HomeModel()),
+          ChangeNotifierProvider(create: (context) => SessionManagerModel()),
+          ChangeNotifierProvider(create: (context) => SettingsModel()),
         ],
         child: MaterialApp(
-            debugShowCheckedModeBanner: false,
-            theme: _getAppTheme(),
-        home: Builder(
-          builder: (context) {
-            return const HomeScreen(title: 'Flutter Demo Home Page');
-          },
-        )));
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.getTheme(),
+          routes: {
+            SessionManagerScreen.route: (context) => const SessionManagerScreen(rootTemplate: null),
+            SettingsScreen.route: (context) => const SettingsScreen()},
+          home: const HomeScreen(),
+        ));
   }
 }
