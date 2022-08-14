@@ -12,7 +12,7 @@ import 'base_service.dart';
 class SubWorldService extends BaseService {
   final _baseUrl = "https://api.staging.deverse.world/api/subworld";
 
-  final AppStorage _appStorage;
+  final AppCache _appStorage;
   SubWorldService(this._appStorage);
   Future<Result<SubWorldTemplateData, Exception>> getRootSubWorlds(int? userId) async {
     var uri = "$_baseUrl/root_template";

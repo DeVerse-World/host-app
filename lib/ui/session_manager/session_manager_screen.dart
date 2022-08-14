@@ -66,6 +66,14 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
                                 });
                           },
                         ),
+                        Consumer<SessionManagerModel>(
+                          builder: (context, model, child) {
+                            if (model.selectedTemplate?.thumbnail_centralized_uri != null) {
+                              return Image(image: NetworkImage(model.selectedTemplate!.thumbnail_centralized_uri));
+                            }
+                            return const SizedBox.shrink();
+                          },
+                        ),
                         Consumer<SessionManagerModel>(builder: (context, model, child) {
                           return Container(
                               color: Colors.white,

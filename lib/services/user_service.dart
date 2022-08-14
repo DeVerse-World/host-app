@@ -9,7 +9,7 @@ import '../data/api/request_body.dart';
 
 class UserService extends BaseService {
   final _baseUrl = "https://api.staging.deverse.world/api/user";
-  final AppStorage _appStorage;
+  final AppCache _appStorage;
 
   UserService(this._appStorage);
 

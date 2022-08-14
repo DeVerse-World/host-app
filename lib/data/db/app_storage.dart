@@ -1,43 +1,37 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-class AppStorage {
-  AppStorage();
+class AppCache {
+  final SharedPreferences _sp;
 
-  Future<SharedPreferences> get _pref {
-    return SharedPreferences.getInstance();
-  }
+  AppCache(this._sp);
 
   void save(String key, dynamic value) async {
-    _pref.then((sp) {
-      if (value is int) {
-        sp.setInt(key, value);
-      } else if (value is bool) {
-        sp.setBool(key, value);
-      } else if (value is double) {
-        sp.setDouble(key, value);
-      } else if (value is String) {
-        sp.setString(key, value);
-      } else if (value is Object) {}
-    });
+    if (value is int) {
+      _sp.setInt(key, value);
+    } else if (value is bool) {
+      _sp.setBool(key, value);
+    } else if (value is double) {
+      _sp.setDouble(key, value);
+    } else if (value is String) {
+      _sp.setString(key, value);
+    } else if (value is Object) {}
   }
 
   void saveItemList(String key, List<dynamic> data) {}
 
   Future<T?> get<T>(String key) async {
-    return _pref.then((sp) {
-      if (T == int) {
-        return sp.getInt(key) as T?;
-      } else if (T == bool) {
-        return sp.getBool(key) as T?;
-      } else if (T == double) {
-        return sp.getDouble(key) as T?;
-      } else if (T == String) {
-        return sp.getString(key) as T?;
-      } else if (T == Object) {
-        var value = sp.getString(key);
-        return null;
-      }
+    if (T == int) {
+      return _sp.getInt(key) as T?;
+    } else if (T == bool) {
+      return _sp.getBool(key) as T?;
+    } else if (T == double) {
+      return _sp.getDouble(key) as T?;
+    } else if (T == String) {
+      return _sp.getString(key) as T?;
+    } else if (T == Object) {
+      var value = _sp.getString(key);
       return null;
-    });
+    }
+    return null;
   }
 }
