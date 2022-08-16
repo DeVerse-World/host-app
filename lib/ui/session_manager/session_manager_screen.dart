@@ -49,9 +49,7 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
                   FilledButton(
                     child: const Text("Launch Verse"),
                     onPressed: () {
-                      _model.onLaunchVerse(_vernameController.text, _playerCountController.text, _portController.text, _beaconController.text).then((value) {
-                        if (!value) {}
-                      });
+                      _model.onLaunchVerse(_vernameController.text, _playerCountController.text, _portController.text, _beaconController.text);
                     },
                   )
                 ],
@@ -96,7 +94,7 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
           .toList();
       contents.insert(
           0, const TableRow(children: [Text("Id"), Text("Name"), Text("Region"), Text("Port"), Text("Beacon Port"), Text("Players"), Text("Actions")]));
-      return Container(
+      return SizedBox(
         width: 800,
         child: Table(
           defaultColumnWidth: const IntrinsicColumnWidth(flex: 1),
@@ -140,8 +138,8 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
                   );
                 }),
             SizedBox(
-              width: 300,
-              height: 300,
+              width: 220,
+              height: 220,
               child: Consumer<SessionManagerModel>(
                 builder: (context, model, child) {
                   if (model.selectedTemplate?.thumbnail_centralized_uri == null) {
