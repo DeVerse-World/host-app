@@ -18,12 +18,12 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
     return Provider.of<SessionManagerModel>(context, listen: false);
   }
 
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
 
-  TextEditingController _vernameController = TextEditingController();
-  TextEditingController _playerCountController = TextEditingController();
-  TextEditingController _portController = TextEditingController(text: "7777");
-  TextEditingController _beaconController = TextEditingController(text: "7877");
+  final TextEditingController _vernameController = TextEditingController();
+  final TextEditingController _playerCountController = TextEditingController();
+  final TextEditingController _portController = TextEditingController(text: "7777");
+  final TextEditingController _beaconController = TextEditingController(text: "7877");
 
   @override
   void initState() {

@@ -39,6 +39,7 @@ dependencies:
   json_annotation: ^4.6.0
   http: ^0.13.5
   url_launcher: ^6.1.5
+  fluent_ui: ^3.12.0
 
 dev_dependencies:
   flutter_test:

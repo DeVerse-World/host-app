@@ -4,6 +4,7 @@ import 'package:deverse_host_app/repositories/world_instance_repository.dart';
 import 'package:deverse_host_app/services/app_service.dart';
 import 'package:deverse_host_app/services/auth_service.dart';
 import 'package:deverse_host_app/services/user_service.dart';
+import 'package:deverse_host_app/ui/widgets/console_view.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -16,7 +17,7 @@ Future<void> initDIContainer() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   container.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
   container.registerSingleton(AppCache(container()));
-  // container.registerSingleton(UserChannel());
+  container.registerSingleton(LogsContainer());
   container.registerSingleton(AppService());
   container.registerSingleton(AuthService());
   container.registerSingleton(SubWorldService(container()));
