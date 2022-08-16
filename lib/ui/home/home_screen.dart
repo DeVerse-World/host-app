@@ -77,7 +77,6 @@ class _HomeScreenState extends State<HomeScreen> {
             }
             return const Text("Please login first");
           }),
-
           const SizedBox(
             height: 20,
           ),
