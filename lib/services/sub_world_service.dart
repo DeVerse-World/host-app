@@ -12,7 +12,7 @@ import 'base_service.dart';
 class SubWorldService extends BaseService {
   final _baseUrl = "https://api.staging.deverse.world/api/subworld";
 
-  final AppStorage _appStorage;
+  final AppCache _appStorage;
   SubWorldService(this._appStorage);
   Future<Result<SubWorldTemplateData, Exception>> getRootSubWorlds(int? userId) async {
     var uri = "$_baseUrl/root_template";
@@ -65,13 +65,11 @@ class SubWorldService extends BaseService {
     });
   }
 
-  Future<Result<String, Exception>> removeInstance(int subworldId) async {
+  Future<String> removeInstance(int subworldId) async {
     var uri = "$_baseUrl/instance/$subworldId";
     var cookie = await _appStorage.get<String>(Constants.COOKIE);
-    return getResult(() async {
-      var res = await http.delete(Uri.parse(uri), headers: generateHeader(cookie ?? ""));
-      final response = parse(res);
-      return response.message;
-    });
+    var res = await http.delete(Uri.parse(uri), headers: generateHeader(cookie ?? ""));
+    final response = parse(res);
+    return response.message;
   }
 }

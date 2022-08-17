@@ -1,24 +1,26 @@
-import 'package:flutter/material.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 
 class AppTheme {
   static ThemeData getTheme() {
     return ThemeData(
-      primaryColor: Colors.lightBlueAccent,
-      primaryIconTheme: const IconThemeData(
-        color: Colors.lightBlueAccent,
-      ),
-      iconTheme: const IconThemeData(
-        color: Colors.lightBlueAccent,
-      ),
-      appBarTheme: const AppBarTheme(backgroundColor: Colors.lightBlueAccent),
-      drawerTheme: const DrawerThemeData(),
-      inputDecorationTheme: const InputDecorationTheme(
-        filled: true,
-        fillColor: Colors.white
-      ),
-      scrollbarTheme: ScrollbarThemeData(
-        thumbVisibility: MaterialStateProperty.all<bool>(true)
-      )
+
+      activeColor: Colors.red
+      // primaryColor: Colors.lightBlueAccent,
+      // primaryIconTheme: const IconThemeData(
+      //   color: Colors.lightBlueAccent,
+      // ),
+      // iconTheme: const IconThemeData(
+      //   color: Colors.lightBlueAccent,
+      // ),
+      // appBarTheme: const AppBarTheme(backgroundColor: Colors.lightBlueAccent),
+      // drawerTheme: const DrawerThemeData(),
+      // inputDecorationTheme: const InputDecorationTheme(
+      //   filled: true,
+      //   fillColor: Colors.white
+      // ),
+      // scrollbarTheme: ScrollbarThemeData(
+      //   thumbVisibility: MaterialStateProperty.all<bool>(true)
+      // )
       // textButtonTheme: TextButtonThemeData(
       //     style: ButtonStyle(
       //         backgroundColor: MaterialStateProperty.resolveWith(_resolveColor),
@@ -26,15 +28,15 @@ class AppTheme {
     );
   }
 
-  static Color _resolveColor(Set<MaterialState> states) {
-    return Colors.lightBlueAccent;
-  }
+  // static Color _resolveColor(Set<MaterialState> states) {
+  //   return Colors.lightBlueAccent;
+  // }
 
-  static TextStyle _resolveStyle(Set<MaterialState> states) {
-    var style = const TextStyle(
-        color : Colors.white,
-
-    );
-    return style;
-  }
+  // static TextStyle _resolveStyle(Set<MaterialState> states) {
+  //   var style = const TextStyle(
+  //       color : Colors.white,
+  //
+  //   );
+  //   return style;
+  // }
 }

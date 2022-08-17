@@ -1,13 +1,18 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:deverse_host_app/data/models/sub_world_config.dart';
 import 'package:deverse_host_app/data/models/sub_world_instance.dart';
 import 'package:deverse_host_app/data/models/sub_world_template.dart';
 import 'package:deverse_host_app/data/models/sub_world_theme.dart';
 import 'package:deverse_host_app/repositories/world_instance_repository.dart';
 import 'package:deverse_host_app/repositories/world_template_repository.dart';
+import 'package:deverse_host_app/ui/base_change_notifier.dart';
 import 'package:deverse_host_app/utils/injection_container.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-class SessionManagerModel extends ChangeNotifier {
+class SessionManagerModel extends BaseModel {
   List<SubWorldTemplate> templates = [];
   final WorldTemplateRepository _worldTemplateRepository = container<WorldTemplateRepository>();
   final WorldInstanceRepository _worldInstanceRepository = container<WorldInstanceRepository>();
@@ -47,18 +52,22 @@ class SessionManagerModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> onLaunchVerse(String verseName, String maxPlayerCount, String port, String beaconPort) async {
-    if (selectedTemplate == null) {
-      return false;
+  Future<void> onLaunchVerse(String verseName, String maxPlayerCount, String port, String beaconPort) async {
+    if (selectedTemplate == null || verseName.isEmpty || maxPlayerCount.isEmpty || port.isEmpty || beaconPort.isEmpty) {
+      logsContainer.addLog("Invalid Input, please check your inputs before launching a verse...");
+      return;
     }
-    _worldInstanceRepository.createInstance(selectedTemplate!, verseName, "vn", maxPlayerCount, port, beaconPort).then((res) {
-      if (res.isFailure) {
-        return;
-      }
-      instances.add(res.data!);
-      notifyListeners();
+    _runServer(verseName, maxPlayerCount, () {
+      _worldInstanceRepository.createInstance(selectedTemplate!, verseName, "vn", maxPlayerCount, port, beaconPort).then((res) {
+        if (res.isFailure) {
+          logsContainer.addLog(res.error.toString());
+          return;
+        }
+        instances.add(res.data!);
+        notifyListeners();
+      });
     });
-    return true;
+
   }
 
   void onDeleteVerse(SubWorldInstance subWorldInstance) {
@@ -67,6 +76,40 @@ class SessionManagerModel extends ChangeNotifier {
         instances.removeWhere((element) => element.id == subWorldInstance.id);
         notifyListeners();
       }
+    });
+  }
+
+  void _runServer(String verseName, String port, Function onServerStarted) {
+    var path = "DeverseServer.exe";
+    if (kDebugMode) {
+      path = "C:/Projects/Deverse_host_app/build/windows/runner/Debug/$path";
+    }
+    Process.start(
+        path,
+        [
+          "\"$verseName\"",
+          "-log",
+          "-port=$port",
+          "-IsMainVerse",
+          "deverse.world",
+          "DevVerse",
+          "dev.deverse.world",
+          "-ImageUrl",
+          selectedTemplate!.thumbnail_centralized_uri,
+          "-ini:Engine:[EpicOnlineServices]:DedicatedServerClientId=${dotenv.env['EpicServerClientId']}",
+          "-ini:Engine:[EpicOnlineServices]:DedicatedServerClientSecret=${dotenv.env['EpicServerClientSecret']}",
+          "-ini:Engine:[EpicOnlineServices]:DedicatedServerPrivateKey=${dotenv.env['EpicServerPrivateKey']}"
+              "&"
+        ],
+        runInShell: true)
+        .then((process) {
+          process.stdout.transform(utf8.decoder).forEach((element) {
+            if (element.contains("Completed")) {
+              onServerStarted.call();
+            }
+          });
+    }).catchError((e) {
+      logsContainer.addLog(e.toString());
     });
   }
 }

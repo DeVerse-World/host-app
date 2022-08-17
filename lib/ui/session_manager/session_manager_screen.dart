@@ -1,7 +1,8 @@
 import 'package:deverse_host_app/data/models/sub_world_template.dart';
 import 'package:deverse_host_app/ui/session_manager/session_manager_model.dart';
 import 'package:deverse_host_app/ui/session_manager/sub_world_config_manager.dart';
-import 'package:flutter/material.dart';
+import 'package:deverse_host_app/ui/widgets/console_view.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
 
 class SessionManagerScreen extends StatefulWidget {
@@ -18,12 +19,12 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
     return Provider.of<SessionManagerModel>(context, listen: false);
   }
 
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
 
-  TextEditingController _vernameController = TextEditingController();
-  TextEditingController _playerCountController = TextEditingController();
-  TextEditingController _portController = TextEditingController(text: "7777");
-  TextEditingController _beaconController = TextEditingController(text: "7877");
+  final TextEditingController _vernameController = TextEditingController();
+  final TextEditingController _playerCountController = TextEditingController();
+  final TextEditingController _portController = TextEditingController(text: "7777");
+  final TextEditingController _beaconController = TextEditingController(text: "7877");
 
   @override
   void initState() {
@@ -33,155 +34,177 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text("Create your stuffs"),
-          centerTitle: true,
-        ),
-        body: Container(
-          padding: const EdgeInsets.all(16),
-          child: SingleChildScrollView(
-            controller: _scrollController,
-            child: Column(
-              children: [
-                Row(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Container(
-                    width: 300.0,
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text("Select specific level"),
-                        Consumer<SessionManagerModel>(
-                          builder: (context, model, child) {
-                            return DropdownButton<SubWorldTemplate>(
-                                isExpanded: true,
-                                hint: const Text("Tap to select..."),
-                                value: _model.selectedTemplate,
-                                items: model.templates.map((template) => DropdownMenuItem(value: template, child: Text(template.display_name))).toList(),
-                                onChanged: (newValue) {
-                                  if (newValue != null) {
-                                    _model.onSelectTemplate(newValue);
-                                  }
-                                });
-                          },
-                        ),
-                        Consumer<SessionManagerModel>(builder: (context, model, child) {
-                          return Container(
-                              color: Colors.white,
-                              height: 100,
-                              child: SubWorldConfigManagerView(data: model.savedConfigs, onApply: (item) {}, onDelete: (item) {}));
-                        })
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: 300.0,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text("Verse name"),
-                        const SizedBox(height: 8),
-                        TextField(
-                          controller: _vernameController,
-                          decoration: const InputDecoration(hintText: "e.g: My awesome verse", border: OutlineInputBorder()),
-                        ),
-                        const SizedBox(height: 36),
-                        const Text("Max player count"),
-                        const SizedBox(height: 8),
-                        TextField(
-                          controller: _playerCountController,
-                          keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(hintText: "e.g: 10", border: OutlineInputBorder()),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: 300.0,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text("Port"),
-                        const SizedBox(height: 8),
-                        TextField(
-                          controller: _portController,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(hintText: "7777", border: OutlineInputBorder()),
-                        ),
-                        const SizedBox(height: 36),
-                        const Text("Beacon port"),
-                        const SizedBox(height: 8),
-                        TextField(
-                          controller: _beaconController,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(hintText: "e.g: 10", border: OutlineInputBorder()),
-                        ),
-                      ],
-                    ),
-                  ),
-                ]),
-                const SizedBox(height: 36),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton(
-                      child: Text("Launch Verse"),
-                      onPressed: () {
-                        _model.onLaunchVerse(_vernameController.text, _playerCountController.text, _portController.text, _beaconController.text).then((value) {
-                          if (!value) {}
-                        });
-                      },
-                    )
-                  ],
-                ),
-                const SizedBox(height: 36),
-                _buildSessionTable(),
-              ],
-              // Row(
-              //   children: [ElevatedButton(onPressed: () {}, child: const Text("Continue"))],
-              // )
-            ),
+    return NavigationView(
+      content: Container(
+        padding: const EdgeInsets.all(16),
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          child: Column(
+            children: [
+              _buildVerseInputSection(),
+              const SizedBox(height: 36),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  FilledButton(
+                    child: const Text("Launch Verse"),
+                    onPressed: () {
+                      _model.onLaunchVerse(_vernameController.text, _playerCountController.text, _portController.text, _beaconController.text);
+                    },
+                  )
+                ],
+              ),
+              const SizedBox(height: 36),
+              _buildSessionTable(),
+              const SizedBox(height: 36),
+              const ConsoleView()
+            ],
+            // Row(
+            //   children: [ElevatedButton(onPressed: () {}, child: const Text("Continue"))],
+            // )
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   Widget _buildSessionTable() {
-    return Consumer<SessionManagerModel>(
-      builder: (context, model, child) => DataTable(
-        columns: [
-          DataColumn(label: const Text("Id")),
-          DataColumn(label: const Text("Name")),
-          DataColumn(label: const Text("Region")),
-          DataColumn(label: const Text("Port")),
-          DataColumn(label: const Text("Beacon Port")),
-          DataColumn(label: const Text("Players")),
-          DataColumn(label: const Text("Actions"))
-        ],
-        rows: model.instances
-            .map((instance) => DataRow(cells: [
-                  DataCell(Text(instance.id.toString())),
-                  DataCell(Text(instance.host_name)),
-                  DataCell(Text(instance.region)),
-                  DataCell(Text(instance.instance_port)),
-                  DataCell(Text(instance.beacon_port)),
-                  DataCell(Text("${instance.num_current_players}/${instance.max_players}")),
-                  DataCell(Row(
-                    children: [
-                      ElevatedButton(
+    return Consumer<SessionManagerModel>(builder: (context, model, child) {
+      var contents = model.instances
+          .map((instance) => TableRow(
+
+          children: [
+                Text(instance.id.toString()),
+                Text(instance.host_name),
+                Text(instance.region),
+                Text(instance.instance_port),
+                Text(instance.beacon_port),
+                Text("${instance.num_current_players}/${instance.max_players}"),
+                Row(
+                  children: [
+                    FilledButton(
+                      onPressed: () {
+                        model.onDeleteVerse(instance);
+                      },
+                      child: const Text("Delete"),
+                    )
+                  ],
+                )
+              ]))
+          .toList();
+      contents.insert(
+          0, const TableRow(children: [Text("Id"), Text("Name"), Text("Region"), Text("Port"), Text("Beacon Port"), Text("Players"), Text("Actions")]));
+      return SizedBox(
+        width: 800,
+        child: Table(
+          defaultColumnWidth: const IntrinsicColumnWidth(flex: 1),
+            // columnWidths: const {
+            //   0: FlexColumnWidth(1),
+            //   1: FlexColumnWidth(2),
+            //   2: FlexColumnWidth(2),
+            //   3: FlexColumnWidth(2),
+            //   4: FlexColumnWidth(2),
+            //   5: FlexColumnWidth(2),
+            //   6: FlexColumnWidth(2),
+            // },
+            border: TableBorder.all(), children: contents),
+      );
+    });
+  }
+
+  Widget _buildVerseInputSection() {
+    return Row(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
+      Container(
+        width: 300.0,
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text("Select specific level"),
+            Consumer<SessionManagerModel>(
+                builder: (context, model, child){
+                  if (model.templates.isEmpty) {
+                    return const SizedBox.shrink();
+                  }
+                  return DropDownButton(
+                    title: Text(_model.selectedTemplate?.display_name ?? "Tap to select..."),
+                    items: model.templates
+                        .map((template) => MenuFlyoutItem(
+                        text: Text(template.display_name),
                         onPressed: () {
-                          model.onDeleteVerse(instance);
-                        },
-                        child: Text("Delete"),
-                      )
-                    ],
-                  ))
-                ]))
-            .toList(),
-        border: TableBorder.all(),
+                          _model.onSelectTemplate(template);
+                        }))
+                        .toList(),
+                  );
+                }),
+            SizedBox(
+              width: 220,
+              height: 220,
+              child: Consumer<SessionManagerModel>(
+                builder: (context, model, child) {
+                  if (model.selectedTemplate?.thumbnail_centralized_uri == null) {
+                    return const Image(image: AssetImage("assets/images/placeholder_background.png"));
+                  }
+                  return Image(image: NetworkImage(model.selectedTemplate!.thumbnail_centralized_uri));
+                },
+              ),
+            ),
+            // Consumer<SessionManagerModel>(builder: (context, model, child) {
+            //   return Container(
+            //       color: Colors.white,
+            //       height: 100,
+            //       child: SubWorldConfigManagerView(data: model.savedConfigs, onApply: (item) {}, onDelete: (item) {}));
+            // })
+          ],
+        ),
       ),
-    );
+      Container(
+        width: 300.0,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text("Verse name"),
+            const SizedBox(height: 8),
+            TextBox(
+              controller: _vernameController,
+              // decoration: const InputDecoration(hintText: "e.g: My awesome verse", border: OutlineInputBorder()),
+            ),
+            const SizedBox(height: 36),
+            const Text("Max player count"),
+            const SizedBox(height: 8),
+            TextBox(
+              controller: _playerCountController,
+              keyboardType: TextInputType.number,
+              // decoration: const InputDecoration(hintText: "e.g: 10", border: OutlineInputBorder()),
+            ),
+          ],
+        ),
+      ),
+      Container(
+        width: 300.0,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text("Port"),
+            const SizedBox(height: 8),
+            TextBox(
+              controller: _portController,
+              keyboardType: TextInputType.number,
+              // decoration: InputDecoration(hintText: "7777", border: OutlineInputBorder()),
+            ),
+            const SizedBox(height: 36),
+            const Text("Beacon port"),
+            const SizedBox(height: 8),
+            TextBox(
+              controller: _beaconController,
+              keyboardType: TextInputType.number,
+              // decoration: InputDecoration(hintText: "e.g: 10", border: OutlineInputBorder()),
+            ),
+          ],
+        ),
+      ),
+    ]);
   }
 }
