@@ -40,6 +40,7 @@ dependencies:
   http: ^0.13.5
   url_launcher: ^6.1.5
   fluent_ui: ^3.12.0
+  flutter_dotenv: ^5.0.2
 
 dev_dependencies:
   flutter_test:
@@ -69,6 +70,7 @@ flutter:
   assets:
     - assets/icons/
     - assets/images/
+    - .env
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -6,10 +6,10 @@ import 'package:deverse_host_app/ui/session_manager/session_manager_model.dart';
 import 'package:deverse_host_app/ui/session_manager/session_manager_screen.dart';
 import 'package:deverse_host_app/ui/settings/settings_model.dart';
 import 'package:deverse_host_app/ui/settings/settings_screen.dart';
-import 'package:deverse_host_app/ui/widgets/console_view.dart';
 import 'package:deverse_host_app/utils/app_theme.dart';
 import 'package:deverse_host_app/utils/injection_container.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:window_size/window_size.dart';
 
@@ -21,9 +21,14 @@ void main() async {
     // await flutter_acrylic.Window.initialize();
     // await WindowManager.instance.ensureInitialized();
   }
-  await initDIContainer();
   // await EasyLocalization.ensureInitialized();
-  runApp(const MyApp());
+  var initJobs = <Future>[
+    initDIContainer(),
+    dotenv.load(fileName: ".env")
+  ];
+  Future.wait(initJobs).then((value) {
+    runApp(const MyApp());
+  });
 }
 
 class MyApp extends StatelessWidget {

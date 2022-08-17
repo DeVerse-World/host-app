@@ -17,7 +17,6 @@ class BaseService {
   DResponse parse(Response response) {
     var data = DResponse.fromJson(json.decode(utf8.decode(response.bodyBytes)));
     if (data.error != null) {
-      // print(data.error);
       logsContainer.addLog(data.error);
       throw Exception(data.error);
     }

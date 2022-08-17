@@ -10,6 +10,7 @@ import 'package:deverse_host_app/repositories/world_template_repository.dart';
 import 'package:deverse_host_app/ui/base_change_notifier.dart';
 import 'package:deverse_host_app/utils/injection_container.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class SessionManagerModel extends BaseModel {
   List<SubWorldTemplate> templates = [];
@@ -95,9 +96,9 @@ class SessionManagerModel extends BaseModel {
           "dev.deverse.world",
           "-ImageUrl",
           selectedTemplate!.thumbnail_centralized_uri,
-          "-ini:Engine:[EpicOnlineServices]:DedicatedServerClientId=xyza78918lRFdOzrwsYpy0UAYOL9aczp",
-          "-ini:Engine:[EpicOnlineServices]:DedicatedServerClientSecret=AbOM+j2USFaRzR0/bslO5g/7E4/IMlJ/GazcT3PdbjU",
-          "-ini:Engine:[EpicOnlineServices]:DedicatedServerPrivateKey=syH/1RLIAil5pSrifb/xjDmfd9j9bhAfVuPLv9AE0uHDPXK8kPxJIIs4gvwNXFfVhM4XR4YrNNPrFxy3UCluCQ=="
+          "-ini:Engine:[EpicOnlineServices]:DedicatedServerClientId=${dotenv.env['EpicServerClientId']}",
+          "-ini:Engine:[EpicOnlineServices]:DedicatedServerClientSecret=${dotenv.env['EpicServerClientSecret']}",
+          "-ini:Engine:[EpicOnlineServices]:DedicatedServerPrivateKey=${dotenv.env['EpicServerPrivateKey']}"
               "&"
         ],
         runInShell: true)
@@ -107,8 +108,6 @@ class SessionManagerModel extends BaseModel {
               onServerStarted.call();
             }
           });
-      // logsContainer.addLog(value.);
-
     }).catchError((e) {
       logsContainer.addLog(e.toString());
     });

@@ -30,6 +30,7 @@ class WorldInstanceRepository extends BaseRepository {
   Future<Result<String?, Exception>> deleteInstance(SubWorldInstance subWorldInstance) async {
     return getResult(() async {
       var res = await _subWorldService.removeInstance(subWorldInstance.id);
+      logsContainer.addLog(res);
       return res;
     });
   }
