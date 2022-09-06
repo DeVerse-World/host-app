@@ -52,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
             if (model.isAuthenticated) {
               return Column(
                 children: [
-                  const Text("Select original subworld theme"),
+                  const Text("Select root subworld theme"),
                   SizedBox(
                     width: 200,
                     child: Consumer<HomeModel>(

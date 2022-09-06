@@ -57,17 +57,9 @@ class SessionManagerModel extends BaseModel {
       logsContainer.addLog("Invalid Input, please check your inputs before launching a verse...");
       return;
     }
-    _runServer(verseName, maxPlayerCount, () {
-      _worldInstanceRepository.createInstance(selectedTemplate!, verseName, "vn", maxPlayerCount, port, beaconPort).then((res) {
-        if (res.isFailure) {
-          logsContainer.addLog(res.error.toString());
-          return;
-        }
-        instances.add(res.data!);
-        notifyListeners();
-      });
+    _createInstance(verseName, maxPlayerCount, port, beaconPort, (int createdInstanceId) {
+      _runServer(verseName, port, createdInstanceId);
     });
-
   }
 
   void onDeleteVerse(SubWorldInstance subWorldInstance) {
@@ -79,7 +71,18 @@ class SessionManagerModel extends BaseModel {
     });
   }
 
-  void _runServer(String verseName, String port, Function onServerStarted) {
+  void _createInstance(String verseName, String maxPlayerCount, String port, String beaconPort, Function onInstanceCreated) {
+    _worldInstanceRepository.createInstance(selectedTemplate!, verseName, "vn", maxPlayerCount, port, beaconPort).then((res) {
+      if (res.isFailure) {
+        logsContainer.addLog(res.error.toString());
+        return;
+      }
+      instances.add(res.data!);
+      onInstanceCreated(res.data!.id);
+    });
+  }
+
+  void _runServer(String verseName, String port, int createdInstanceId) {
     var path = "DeverseServer.exe";
     if (kDebugMode) {
       path = "C:/Projects/Deverse_host_app/build/windows/runner/Debug/$path";
@@ -95,6 +98,8 @@ class SessionManagerModel extends BaseModel {
           "DevVerse",
           "dev.deverse.world",
           "-ImageUrl",
+          "-InstanceId",
+          createdInstanceId.toString(),
           selectedTemplate!.thumbnail_centralized_uri,
           "-ini:Engine:[EpicOnlineServices]:DedicatedServerClientId=${dotenv.env['EpicServerClientId']}",
           "-ini:Engine:[EpicOnlineServices]:DedicatedServerClientSecret=${dotenv.env['EpicServerClientSecret']}",
@@ -104,12 +109,23 @@ class SessionManagerModel extends BaseModel {
         runInShell: true)
         .then((process) {
           process.stdout.transform(utf8.decoder).forEach((element) {
+            // print(element);
+            // if (element.contains("Successfully")) {
+            //   print("got here");
+            //   var tokens = element.replaceAll("'", "").split(" ");
+            //   var sessionID = tokens.last;
+            //   print(sessionID);
+            //   logsContainer.addLog("Successfully created session '$sessionID'");
+            // }
             if (element.contains("Completed")) {
-              onServerStarted.call();
+              notifyListeners();
             }
           });
     }).catchError((e) {
       logsContainer.addLog(e.toString());
+      instances.removeWhere((element) => element.id == createdInstanceId);
+      logsContainer.addLog("Instance '$createdInstanceId' was removed due to an exception occurs.");
+      notifyListeners();
     });
   }
 }
