@@ -58,7 +58,7 @@ class SessionManagerModel extends BaseModel {
       return;
     }
     _createInstance(verseName, maxPlayerCount, port, beaconPort, (int createdInstanceId) {
-      _runServer(verseName, port, createdInstanceId);
+      _runServer(verseName, port, beaconPort, createdInstanceId);
     });
   }
 
@@ -82,7 +82,7 @@ class SessionManagerModel extends BaseModel {
     });
   }
 
-  void _runServer(String verseName, String port, int createdInstanceId) {
+  void _runServer(String verseName, String port, String beaconPort, int createdInstanceId) {
     var path = "DeverseServer.exe";
     if (kDebugMode) {
       path = "C:/Projects/Deverse_host_app/build/windows/runner/Debug/$path";
@@ -90,17 +90,20 @@ class SessionManagerModel extends BaseModel {
     Process.start(
         path,
         [
-          "\"$verseName\"",
+          selectedTemplate!.file_name,
           "-log",
-          "-port=$port",
+          "-Port=$port",
+          "-BeaconPort=$beaconPort"
           "-IsMainVerse",
           "deverse.world",
           "DevVerse",
           "dev.deverse.world",
+          "-HostName",
+          verseName,
           "-ImageUrl",
+          selectedTemplate!.thumbnail_centralized_uri,
           "-InstanceId",
           createdInstanceId.toString(),
-          selectedTemplate!.thumbnail_centralized_uri,
           "-ini:Engine:[EpicOnlineServices]:DedicatedServerClientId=${dotenv.env['EpicServerClientId']}",
           "-ini:Engine:[EpicOnlineServices]:DedicatedServerClientSecret=${dotenv.env['EpicServerClientSecret']}",
           "-ini:Engine:[EpicOnlineServices]:DedicatedServerPrivateKey=${dotenv.env['EpicServerPrivateKey']}"
@@ -123,7 +126,9 @@ class SessionManagerModel extends BaseModel {
           });
     }).catchError((e) {
       logsContainer.addLog(e.toString());
+      var deletingInstance = instances.firstWhere((element) => element.id == createdInstanceId);
       instances.removeWhere((element) => element.id == createdInstanceId);
+      onDeleteVerse(deletingInstance);
       logsContainer.addLog("Instance '$createdInstanceId' was removed due to an exception occurs.");
       notifyListeners();
     });
