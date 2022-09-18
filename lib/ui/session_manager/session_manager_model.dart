@@ -104,6 +104,8 @@ class SessionManagerModel extends BaseModel {
           selectedTemplate!.thumbnail_centralized_uri,
           "-InstanceId",
           createdInstanceId.toString(),
+          "-TemplateId",
+          selectedTemplate!.id.toString(),
           "-ini:Engine:[EpicOnlineServices]:DedicatedServerClientId=${dotenv.env['EpicServerClientId']}",
           "-ini:Engine:[EpicOnlineServices]:DedicatedServerClientSecret=${dotenv.env['EpicServerClientSecret']}",
           "-ini:Engine:[EpicOnlineServices]:DedicatedServerPrivateKey=${dotenv.env['EpicServerPrivateKey']}"
