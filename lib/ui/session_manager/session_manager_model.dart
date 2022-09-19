@@ -132,7 +132,7 @@ class SessionManagerModel extends BaseModel {
       var deletingInstance = instances.firstWhere((element) => element.id == createdInstanceId);
       instances.removeWhere((element) => element.id == createdInstanceId);
       onDeleteVerse(deletingInstance);
-      logsContainer.addLog("Instance '$createdInstanceId' was removed due to an exception occurs.");
+      logsContainer.addLog("Instance '$createdInstanceId' Instance was closed by user.");
       notifyListeners();
     });
   }
