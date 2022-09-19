@@ -52,7 +52,7 @@ class SessionManagerModel extends BaseModel {
     notifyListeners();
   }
 
-  Future<void> onLaunchVerse(String verseName, String maxPlayerCount, String port, String beaconPort) async {
+  void onLaunchVerse(String verseName, String maxPlayerCount, String port, String beaconPort) {
     if (selectedTemplate == null || verseName.isEmpty || maxPlayerCount.isEmpty || port.isEmpty || beaconPort.isEmpty) {
       logsContainer.addLog("Invalid Input, please check your inputs before launching a verse...");
       return;
@@ -82,12 +82,12 @@ class SessionManagerModel extends BaseModel {
     });
   }
 
-  void _runServer(String verseName, String port, String beaconPort, int createdInstanceId) {
-    var path = "DeverseServer.exe";
+  void _runServer(String verseName, String port, String beaconPort, int createdInstanceId) async {
+    var path = "${Directory.current.path}/DeverseServer/DeverseServer.exe";
     if (kDebugMode) {
-      path = "C:/Projects/Deverse_host_app/build/windows/runner/Debug/$path";
+      path = "${Directory.current.path}/build/windows/runner/Debug/DeverseServer/DeverseServer.exe";
     }
-    Process.start(
+    var process = await Process.start(
         path,
         [
           selectedTemplate!.file_name,
@@ -111,23 +111,24 @@ class SessionManagerModel extends BaseModel {
           "-ini:Engine:[EpicOnlineServices]:DedicatedServerPrivateKey=${dotenv.env['EpicServerPrivateKey']}"
               "&"
         ],
-        runInShell: true)
-        .then((process) {
-          process.stdout.transform(utf8.decoder).forEach((element) {
-            // print(element);
-            // if (element.contains("Successfully")) {
-            //   print("got here");
-            //   var tokens = element.replaceAll("'", "").split(" ");
-            //   var sessionID = tokens.last;
-            //   print(sessionID);
-            //   logsContainer.addLog("Successfully created session '$sessionID'");
-            // }
-            if (element.contains("Completed")) {
-              notifyListeners();
-            }
-          });
-    }).catchError((e) {
-      logsContainer.addLog(e.toString());
+        runInShell: true);
+    process.stdout.transform(utf8.decoder).forEach((element) {
+      // print(element);
+      // if (element.contains("Successfully")) {
+      //   print("got here");
+      //   var tokens = element.replaceAll("'", "").split(" ");
+      //   var sessionID = tokens.last;
+      //   print(sessionID);
+      //   logsContainer.addLog("Successfully created session '$sessionID'");
+      // }
+      if (element.contains("Completed")) {
+        notifyListeners();
+      }
+    });
+    process.stderr.transform(utf8.decoder).forEach((element) {
+      print(element);
+    });
+    process.exitCode.then((value) {
       var deletingInstance = instances.firstWhere((element) => element.id == createdInstanceId);
       instances.removeWhere((element) => element.id == createdInstanceId);
       onDeleteVerse(deletingInstance);
