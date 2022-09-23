@@ -5,6 +5,8 @@ import 'package:fluent_ui/fluent_ui.dart';
 
 import 'package:provider/provider.dart';
 
+import '../../data/models/sub_world_instance.dart';
+
 class SessionManagerScreen extends StatefulWidget {
   const SessionManagerScreen({Key? key, required this.rootTemplate})
       : super(key: key);
@@ -59,7 +61,7 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
           child: Column(
             children: [
               _buildVerseInputSection(),
-              const SizedBox(height: 36),
+              const SizedBox(height: 18),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -80,9 +82,9 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
                   )
                 ],
               ),
-              const SizedBox(height: 36),
+              const SizedBox(height: 18),
               _buildSessionTable(),
-              const SizedBox(height: 36),
+              const SizedBox(height: 18),
               const ConsoleView()
             ],
             // Row(
@@ -95,11 +97,24 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
   }
 
   Widget _buildSessionTable() {
-    return SizedBox(
-      height: 250,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 0, maxHeight: 250),
       child: SingleChildScrollView(
         child: Consumer<SessionManagerModel>(builder: (context, model, child) {
-          var contents = (model.instances + model.instances + model.instances)
+          var contents = (model.instances
+              // +
+              //     [
+              //       SubWorldInstance(1, "", "", 1, 1, "", "", 1, 1, "", ""),
+              //       SubWorldInstance(1, "", "", 1, 1, "", "", 1, 1, "", ""),
+              //       SubWorldInstance(1, "", "", 1, 1, "", "", 1, 1, "", ""),
+              //       SubWorldInstance(1, "", "", 1, 1, "", "", 1, 1, "", ""),
+              //       SubWorldInstance(1, "", "", 1, 1, "", "", 1, 1, "", ""),
+              //       SubWorldInstance(1, "", "", 1, 1, "", "", 1, 1, "", ""),
+              //       SubWorldInstance(1, "", "", 1, 1, "", "", 1, 1, "", ""),
+              //       SubWorldInstance(1, "", "", 1, 1, "", "", 1, 1, "", ""),
+              //       SubWorldInstance(1, "", "", 1, 1, "", "", 1, 1, "", ""),
+              //     ]
+          )
               .map((instance) => TableRow(children: [
                     _buildSessionContent(instance.id.toString()),
                     _buildSessionContent(instance.host_name),
@@ -257,7 +272,7 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
               child: _vernameError
                   ? Text(
                       "Enter verse name, plz",
-                      style: TextStyle(color: Colors.yellow),
+                      style: TextStyle(color: Colors.red),
                     )
                   : null,
             ),
@@ -274,7 +289,7 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
             _maxPlayerError
                 ? Text(
                     "Enter valid max player count, plz",
-                    style: TextStyle(color: Colors.yellow),
+                    style: TextStyle(color: Colors.red),
                   )
                 : const SizedBox(),
           ],
