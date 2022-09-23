@@ -177,15 +177,15 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
   Widget _buildVerseInputSection() {
     return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Container(
-        width: 250.0,
+        width: 300.0,
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             SizedBox(
-              width: 80,
-              height: 80,
+              width: 120,
+              height: 120,
               child: Consumer<SessionManagerModel>(
                 builder: (context, model, child) {
                   if (model.selectedTemplate?.thumbnail_centralized_uri ==
