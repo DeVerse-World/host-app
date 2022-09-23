@@ -28,10 +28,16 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildTemplateList(List<SubWorldTemplate> templates) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Wrap(
+      direction: Axis.vertical,
+      spacing: 12,
       children: templates
-          .map((template) => Checkbox(
+          .map((template) => RadioButton(
+              // style: RadioButtonThemeData(
+              //   checkedDecoration: ButtonState.resolveWith((states) => {
+              //
+              //   })
+              // ),
               checked: _selectedTemplate?.id == template.id,
               content: Text(template.display_name),
               onChanged: (value) {
@@ -83,19 +89,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ],
                         ),
-                        SizedBox(
-                          width: 100,
-                          child: FilledButton(
-                            onPressed: () {
-                              if (_selectedTemplate != null) {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => SessionManagerScreen(
-                                        rootTemplate: _selectedTemplate!)));
-                              }
-                            },
-                            child: const Text("Next"),
-                          ),
-                        ),
                       ],
                     ),
                   ),
@@ -109,18 +102,36 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Consumer<HomeModel>(
             builder: (context, model, child) {
-              if (model.isAuthenticated) {
+              if (!model.isAuthenticated) {
                 return Button(
                     onPressed: () {
-                      _model.logout();
+                      _model.authenticate(true);
                     },
-                    child: const Text("Log out"));
+                    child: const Text("Authenticate"));
               }
-              return Button(
-                  onPressed: () {
-                    _model.authenticate(true);
-                  },
-                  child: const Text("Authenticate"));
+              return Row(
+                children: [
+                  SizedBox(
+                    width: 80,
+                    child: FilledButton(
+                      onPressed: () {
+                        if (_selectedTemplate != null) {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => SessionManagerScreen(
+                                  rootTemplate: _selectedTemplate!)));
+                        }
+                      },
+                      child: const Text("Next"),
+                    ),
+                  ),
+                  const SizedBox(width: 20  ,),
+                  Button(
+                      onPressed: () {
+                        _model.logout();
+                      },
+                      child: const Text("Logout")),
+                ]
+              );
             },
           ),
           const Expanded(child: SizedBox()),

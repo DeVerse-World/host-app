@@ -183,40 +183,6 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            SizedBox(
-              width: 120,
-              height: 120,
-              child: Consumer<SessionManagerModel>(
-                builder: (context, model, child) {
-                  if (model.selectedTemplate?.thumbnail_centralized_uri ==
-                      null) {
-                    return Image.asset(
-                      fit: BoxFit.fill,
-                      "assets/images/placeholder_background.png",
-                    );
-                  }
-                  return Image.network(
-                    model.selectedTemplate!.thumbnail_centralized_uri,
-                    fit: BoxFit.fill,
-                    loadingBuilder: (
-                      BuildContext context,
-                      Widget child,
-                      ImageChunkEvent? loadingProgress,
-                    ) {
-                      if (loadingProgress == null) {
-                        return child;
-                      }
-                      return const Center(
-                        child: ProgressRing(),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-            const SizedBox(
-              width: 10,
-            ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -240,6 +206,37 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
                         .toList(),
                   );
                 }),
+                SizedBox(
+                  width: 220,
+                  height: 220,
+                  child: Consumer<SessionManagerModel>(
+                    builder: (context, model, child) {
+                      if (model.selectedTemplate?.thumbnail_centralized_uri ==
+                          null) {
+                        return Image.asset(
+                          fit: BoxFit.fill,
+                          "assets/images/placeholder_background.png",
+                        );
+                      }
+                      return Image.network(
+                        model.selectedTemplate!.thumbnail_centralized_uri,
+                        fit: BoxFit.fill,
+                        loadingBuilder: (
+                            BuildContext context,
+                            Widget child,
+                            ImageChunkEvent? loadingProgress,
+                            ) {
+                          if (loadingProgress == null) {
+                            return child;
+                          }
+                          return const Center(
+                            child: ProgressRing(),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
               ],
             ),
 
