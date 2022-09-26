@@ -52,22 +52,14 @@ class SessionManagerModel extends BaseModel {
     notifyListeners();
   }
 
-  Future<void> onLaunchVerse(String verseName, String maxPlayerCount, String port, String beaconPort) async {
+  void onLaunchVerse(String verseName, String maxPlayerCount, String port, String beaconPort) {
     if (selectedTemplate == null || verseName.isEmpty || maxPlayerCount.isEmpty || port.isEmpty || beaconPort.isEmpty) {
       logsContainer.addLog("Invalid Input, please check your inputs before launching a verse...");
       return;
     }
-    _runServer(verseName, maxPlayerCount, () {
-      _worldInstanceRepository.createInstance(selectedTemplate!, verseName, "vn", maxPlayerCount, port, beaconPort).then((res) {
-        if (res.isFailure) {
-          logsContainer.addLog(res.error.toString());
-          return;
-        }
-        instances.add(res.data!);
-        notifyListeners();
-      });
+    _createInstance(verseName, maxPlayerCount, port, beaconPort, (int createdInstanceId) {
+      _runServer(verseName, port, beaconPort, createdInstanceId);
     });
-
   }
 
   void onDeleteVerse(SubWorldInstance subWorldInstance) {
@@ -79,37 +71,63 @@ class SessionManagerModel extends BaseModel {
     });
   }
 
-  void _runServer(String verseName, String port, Function onServerStarted) {
-    var path = "DeverseServer.exe";
+  void _createInstance(String verseName, String maxPlayerCount, String port, String beaconPort, Function onInstanceCreated) {
+    _worldInstanceRepository.createInstance(selectedTemplate!, verseName, "vn", maxPlayerCount, port, beaconPort).then((res) {
+      if (res.isFailure) {
+        logsContainer.addLog(res.error.toString());
+        return;
+      }
+      instances.add(res.data!);
+      onInstanceCreated(res.data!.id);
+    });
+  }
+
+  void _runServer(String verseName, String port, String beaconPort, int createdInstanceId) async {
+    var path = "${Directory.current.path}/DeverseServer/DeverseServer.exe";
     if (kDebugMode) {
-      path = "C:/Projects/Deverse_host_app/build/windows/runner/Debug/$path";
+      path = "${Directory.current.path}/build/windows/runner/Debug/DeverseServer/DeverseServer.exe";
     }
-    Process.start(
+    var process = await Process.start(
         path,
         [
-          "\"$verseName\"",
+          selectedTemplate!.file_name,
           "-log",
-          "-port=$port",
-          "-IsMainVerse",
-          "deverse.world",
-          "DevVerse",
-          "dev.deverse.world",
-          "-ImageUrl",
-          selectedTemplate!.thumbnail_centralized_uri,
+          "-Port=$port",
+          "-BeaconPort=$beaconPort"
+          "-IsMainVerse=deverse.world",
+          "-DevVerse=dev.deverse.world",
+          "-HostName=$verseName",
+          "-ImageUrl=${selectedTemplate!.thumbnail_centralized_uri}",
+          "-InstanceId=${createdInstanceId.toString()}",
+          "-TemplateId=${selectedTemplate!.id.toString()}",
           "-ini:Engine:[EpicOnlineServices]:DedicatedServerClientId=${dotenv.env['EpicServerClientId']}",
           "-ini:Engine:[EpicOnlineServices]:DedicatedServerClientSecret=${dotenv.env['EpicServerClientSecret']}",
           "-ini:Engine:[EpicOnlineServices]:DedicatedServerPrivateKey=${dotenv.env['EpicServerPrivateKey']}"
               "&"
         ],
-        runInShell: true)
-        .then((process) {
-          process.stdout.transform(utf8.decoder).forEach((element) {
-            if (element.contains("Completed")) {
-              onServerStarted.call();
-            }
-          });
-    }).catchError((e) {
-      logsContainer.addLog(e.toString());
+        runInShell: true);
+    process.stdout.transform(utf8.decoder).forEach((element) {
+      // print(element);
+      // if (element.contains("Successfully")) {
+      //   print("got here");
+      //   var tokens = element.replaceAll("'", "").split(" ");
+      //   var sessionID = tokens.last;
+      //   print(sessionID);
+      //   logsContainer.addLog("Successfully created session '$sessionID'");
+      // }
+      if (element.contains("Completed")) {
+        notifyListeners();
+      }
+    });
+    process.stderr.transform(utf8.decoder).forEach((element) {
+      print(element);
+    });
+    process.exitCode.then((value) {
+      var deletingInstance = instances.firstWhere((element) => element.id == createdInstanceId);
+      instances.removeWhere((element) => element.id == createdInstanceId);
+      onDeleteVerse(deletingInstance);
+      logsContainer.addLog("Instance '$createdInstanceId' Instance was closed by user.");
+      notifyListeners();
     });
   }
 }

@@ -1,12 +1,15 @@
 import 'package:deverse_host_app/data/models/sub_world_template.dart';
 import 'package:deverse_host_app/ui/session_manager/session_manager_model.dart';
-import 'package:deverse_host_app/ui/session_manager/sub_world_config_manager.dart';
 import 'package:deverse_host_app/ui/widgets/console_view.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+
 import 'package:provider/provider.dart';
 
+import '../../data/models/sub_world_instance.dart';
+
 class SessionManagerScreen extends StatefulWidget {
-  const SessionManagerScreen({Key? key, required this.rootTemplate}) : super(key: key);
+  const SessionManagerScreen({Key? key, required this.rootTemplate})
+      : super(key: key);
   static const route = '/gameManager';
   final SubWorldTemplate? rootTemplate;
 
@@ -23,8 +26,13 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
 
   final TextEditingController _vernameController = TextEditingController();
   final TextEditingController _playerCountController = TextEditingController();
-  final TextEditingController _portController = TextEditingController(text: "7777");
-  final TextEditingController _beaconController = TextEditingController(text: "7877");
+  final TextEditingController _portController =
+      TextEditingController(text: "7777");
+  final TextEditingController _beaconController =
+      TextEditingController(text: "7877");
+
+  bool _vernameError = false;
+  bool _maxPlayerError = false;
 
   @override
   void initState() {
@@ -35,6 +43,17 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
   @override
   Widget build(BuildContext context) {
     return NavigationView(
+      appBar: NavigationAppBar(
+        title: Text(widget.rootTemplate!.display_name),
+        leading: Center(
+          child: IconButton(
+            icon: const Icon(FluentIcons.back),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ),
+      ),
       content: Container(
         padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(
@@ -42,21 +61,30 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
           child: Column(
             children: [
               _buildVerseInputSection(),
-              const SizedBox(height: 36),
+              const SizedBox(height: 18),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   FilledButton(
                     child: const Text("Launch Verse"),
                     onPressed: () {
-                      _model.onLaunchVerse(_vernameController.text, _playerCountController.text, _portController.text, _beaconController.text);
+                      setState(() {
+                        _vernameError = _vernameController.text.isEmpty;
+                        _maxPlayerError = _playerCountController.text.isEmpty;
+                      });
+                      if (_vernameError || _maxPlayerError) return;
+                      _model.onLaunchVerse(
+                          _vernameController.text,
+                          _playerCountController.text,
+                          _portController.text,
+                          _beaconController.text);
                     },
                   )
                 ],
               ),
-              const SizedBox(height: 36),
+              const SizedBox(height: 18),
               _buildSessionTable(),
-              const SizedBox(height: 36),
+              const SizedBox(height: 18),
               const ConsoleView()
             ],
             // Row(
@@ -69,86 +97,149 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
   }
 
   Widget _buildSessionTable() {
-    return Consumer<SessionManagerModel>(builder: (context, model, child) {
-      var contents = model.instances
-          .map((instance) => TableRow(
-
-          children: [
-                Text(instance.id.toString()),
-                Text(instance.host_name),
-                Text(instance.region),
-                Text(instance.instance_port),
-                Text(instance.beacon_port),
-                Text("${instance.num_current_players}/${instance.max_players}"),
-                Row(
-                  children: [
-                    FilledButton(
-                      onPressed: () {
-                        model.onDeleteVerse(instance);
-                      },
-                      child: const Text("Delete"),
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 0, maxHeight: 250),
+      child: SingleChildScrollView(
+        child: Consumer<SessionManagerModel>(builder: (context, model, child) {
+          var contents = (model.instances
+              // +
+              //     [
+              //       SubWorldInstance(1, "", "", 1, 1, "", "", 1, 1, "", ""),
+              //       SubWorldInstance(1, "", "", 1, 1, "", "", 1, 1, "", ""),
+              //       SubWorldInstance(1, "", "", 1, 1, "", "", 1, 1, "", ""),
+              //       SubWorldInstance(1, "", "", 1, 1, "", "", 1, 1, "", ""),
+              //       SubWorldInstance(1, "", "", 1, 1, "", "", 1, 1, "", ""),
+              //       SubWorldInstance(1, "", "", 1, 1, "", "", 1, 1, "", ""),
+              //       SubWorldInstance(1, "", "", 1, 1, "", "", 1, 1, "", ""),
+              //       SubWorldInstance(1, "", "", 1, 1, "", "", 1, 1, "", ""),
+              //       SubWorldInstance(1, "", "", 1, 1, "", "", 1, 1, "", ""),
+              //     ]
+          )
+              .map((instance) => TableRow(children: [
+                    _buildSessionContent(instance.id.toString()),
+                    _buildSessionContent(instance.host_name),
+                    _buildSessionContent(instance.region),
+                    _buildSessionContent(instance.instance_port),
+                    _buildSessionContent(instance.beacon_port),
+                    _buildSessionContent(
+                        "${instance.num_current_players}/${instance.max_players}"),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              model.onDeleteVerse(instance);
+                            },
+                            icon: Icon(
+                              FluentIcons.delete,
+                              color: Colors.red,
+                            ),
+                          )
+                        ],
+                      ),
                     )
-                  ],
-                )
-              ]))
-          .toList();
-      contents.insert(
-          0, const TableRow(children: [Text("Id"), Text("Name"), Text("Region"), Text("Port"), Text("Beacon Port"), Text("Players"), Text("Actions")]));
-      return SizedBox(
-        width: 800,
-        child: Table(
-          defaultColumnWidth: const IntrinsicColumnWidth(flex: 1),
-            // columnWidths: const {
-            //   0: FlexColumnWidth(1),
-            //   1: FlexColumnWidth(2),
-            //   2: FlexColumnWidth(2),
-            //   3: FlexColumnWidth(2),
-            //   4: FlexColumnWidth(2),
-            //   5: FlexColumnWidth(2),
-            //   6: FlexColumnWidth(2),
-            // },
-            border: TableBorder.all(), children: contents),
-      );
-    });
+                  ]))
+              .toList();
+          contents.insert(
+              0,
+              TableRow(children: [
+                _buildSessionTitle("Id"),
+                _buildSessionTitle("Name"),
+                _buildSessionTitle("Region"),
+                _buildSessionTitle("Port"),
+                _buildSessionTitle("Beacon Port"),
+                _buildSessionTitle("Players"),
+                _buildSessionTitle("Actions")
+              ]));
+          return SizedBox(
+            width: 800,
+            child: Table(
+                defaultColumnWidth: const IntrinsicColumnWidth(flex: 1),
+                // columnWidths: const {
+                //   0: FlexColumnWidth(1),
+                //   1: FlexColumnWidth(2),
+                //   2: FlexColumnWidth(2),
+                //   3: FlexColumnWidth(2),
+                //   4: FlexColumnWidth(2),
+                //   5: FlexColumnWidth(2),
+                //   6: FlexColumnWidth(2),
+                // },
+                border: TableBorder.all(),
+                children: contents),
+          );
+        }),
+      ),
+    );
   }
 
   Widget _buildVerseInputSection() {
-    return Row(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
+    return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Container(
         width: 300.0,
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-        child: Column(
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            const Text("Select specific level"),
-            Consumer<SessionManagerModel>(
-                builder: (context, model, child){
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Select specific level",
+                  style: TextStyle(fontWeight: FontWeight.w500),
+                ),
+                Consumer<SessionManagerModel>(builder: (context, model, child) {
                   if (model.templates.isEmpty) {
                     return const SizedBox.shrink();
                   }
                   return DropDownButton(
-                    title: Text(_model.selectedTemplate?.display_name ?? "Tap to select..."),
+                    title: Text(_model.selectedTemplate?.display_name ??
+                        "Tap to select..."),
                     items: model.templates
                         .map((template) => MenuFlyoutItem(
-                        text: Text(template.display_name),
-                        onPressed: () {
-                          _model.onSelectTemplate(template);
-                        }))
+                            text: Text(template.display_name),
+                            onPressed: () {
+                              _model.onSelectTemplate(template);
+                            }))
                         .toList(),
                   );
                 }),
-            SizedBox(
-              width: 220,
-              height: 220,
-              child: Consumer<SessionManagerModel>(
-                builder: (context, model, child) {
-                  if (model.selectedTemplate?.thumbnail_centralized_uri == null) {
-                    return const Image(image: AssetImage("assets/images/placeholder_background.png"));
-                  }
-                  return Image(image: NetworkImage(model.selectedTemplate!.thumbnail_centralized_uri));
-                },
-              ),
+                SizedBox(
+                  width: 220,
+                  height: 220,
+                  child: Consumer<SessionManagerModel>(
+                    builder: (context, model, child) {
+                      if (model.selectedTemplate?.thumbnail_centralized_uri ==
+                          null) {
+                        return Image.asset(
+                          fit: BoxFit.fill,
+                          "assets/images/placeholder_background.png",
+                        );
+                      }
+                      return Image.network(
+                        model.selectedTemplate!.thumbnail_centralized_uri,
+                        fit: BoxFit.fill,
+                        loadingBuilder: (
+                            BuildContext context,
+                            Widget child,
+                            ImageChunkEvent? loadingProgress,
+                            ) {
+                          if (loadingProgress == null) {
+                            return child;
+                          }
+                          return const Center(
+                            child: ProgressRing(),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
+
             // Consumer<SessionManagerModel>(builder: (context, model, child) {
             //   return Container(
             //       color: Colors.white,
@@ -164,20 +255,40 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("Verse name"),
+            const Text(
+              "Verse name",
+              style: TextStyle(fontWeight: FontWeight.w500),
+            ),
             const SizedBox(height: 8),
             TextBox(
               controller: _vernameController,
               // decoration: const InputDecoration(hintText: "e.g: My awesome verse", border: OutlineInputBorder()),
             ),
-            const SizedBox(height: 36),
-            const Text("Max player count"),
+            SizedBox(
+              height: 36,
+              child: _vernameError
+                  ? Text(
+                      "Enter verse name, plz",
+                      style: TextStyle(color: Colors.red),
+                    )
+                  : null,
+            ),
+            const Text(
+              "Max player count",
+              style: TextStyle(fontWeight: FontWeight.w500),
+            ),
             const SizedBox(height: 8),
             TextBox(
               controller: _playerCountController,
               keyboardType: TextInputType.number,
               // decoration: const InputDecoration(hintText: "e.g: 10", border: OutlineInputBorder()),
             ),
+            _maxPlayerError
+                ? Text(
+                    "Enter valid max player count, plz",
+                    style: TextStyle(color: Colors.red),
+                  )
+                : const SizedBox(),
           ],
         ),
       ),
@@ -187,7 +298,10 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("Port"),
+            const Text(
+              "Port",
+              style: TextStyle(fontWeight: FontWeight.w500),
+            ),
             const SizedBox(height: 8),
             TextBox(
               controller: _portController,
@@ -195,7 +309,10 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
               // decoration: InputDecoration(hintText: "7777", border: OutlineInputBorder()),
             ),
             const SizedBox(height: 36),
-            const Text("Beacon port"),
+            const Text(
+              "Beacon port",
+              style: TextStyle(fontWeight: FontWeight.w500),
+            ),
             const SizedBox(height: 8),
             TextBox(
               controller: _beaconController,
@@ -206,5 +323,24 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
         ),
       ),
     ]);
+  }
+
+  Widget _buildSessionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.all(8),
+      child: Text(
+        title,
+        style: const TextStyle(fontWeight: FontWeight.w500),
+      ),
+    );
+  }
+
+  Widget _buildSessionContent(String value) {
+    return Padding(
+      padding: const EdgeInsets.all(8),
+      child: Text(
+        value,
+      ),
+    );
   }
 }
