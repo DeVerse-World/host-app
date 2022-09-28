@@ -1,3 +1,4 @@
+import 'package:deverse_host_app/data/models/sub_world_config.dart';
 import 'package:deverse_host_app/data/models/sub_world_template.dart';
 import 'package:deverse_host_app/ui/session_manager/session_manager_model.dart';
 import 'package:deverse_host_app/ui/widgets/console_view.dart';
@@ -33,6 +34,7 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
 
   bool _vernameError = false;
   bool _maxPlayerError = false;
+  SubWorldConfig? _selectedConfig;
 
   @override
   void initState() {
@@ -66,7 +68,7 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   FilledButton(
-                    child: const Text("Launch Verse"),
+                    child: const Text("Launch world"),
                     onPressed: () {
                       setState(() {
                         _vernameError = _vernameController.text.isEmpty;
@@ -114,7 +116,7 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
               //       SubWorldInstance(1, "", "", 1, 1, "", "", 1, 1, "", ""),
               //       SubWorldInstance(1, "", "", 1, 1, "", "", 1, 1, "", ""),
               //     ]
-          )
+              )
               .map((instance) => TableRow(children: [
                     _buildSessionContent(instance.id.toString()),
                     _buildSessionContent(instance.host_name),
@@ -222,10 +224,10 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
                         model.selectedTemplate!.thumbnail_centralized_uri,
                         fit: BoxFit.fill,
                         loadingBuilder: (
-                            BuildContext context,
-                            Widget child,
-                            ImageChunkEvent? loadingProgress,
-                            ) {
+                          BuildContext context,
+                          Widget child,
+                          ImageChunkEvent? loadingProgress,
+                        ) {
                           if (loadingProgress == null) {
                             return child;
                           }
@@ -289,6 +291,35 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
                     style: TextStyle(color: Colors.red),
                   )
                 : const SizedBox(),
+            const SizedBox(
+              height: 8,
+            ),
+            const Text(
+              "Choose saved config",
+              style: TextStyle(fontSize: 10),
+            ),
+            Consumer<SessionManagerModel>(builder: (context, model, child) {
+              if (model.templates.isEmpty) {
+                return const SizedBox.shrink();
+              }
+              return DropDownButton(
+                title: Text(_selectedConfig?.name ?? "Tap to select..."),
+                items: model.savedConfigs
+                    .map((template) => MenuFlyoutItem(
+                        text: Text(template.name),
+                        onPressed: () {
+                          setState(() {
+                            _selectedConfig = template;
+                            _vernameController.text = template.name;
+                            _playerCountController.text =
+                                "${template.maxPlayerCount}";
+                            _portController.text = "${template.port}";
+                            _beaconController.text = "${template.beaconPort}";
+                          });
+                        }))
+                    .toList(),
+              );
+            }),
           ],
         ),
       ),
@@ -319,6 +350,29 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
               keyboardType: TextInputType.number,
               // decoration: InputDecoration(hintText: "e.g: 10", border: OutlineInputBorder()),
             ),
+            const SizedBox(
+              height: 8,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                FilledButton(
+                    child: const Text("Save"),
+                    onPressed: () {
+                      setState(() {
+                        _vernameError = _vernameController.text.isEmpty;
+                        _maxPlayerError = _playerCountController.text.isEmpty;
+                      });
+                      if (_vernameError || _maxPlayerError) return;
+                      _model.onSaveConfig(
+                        _vernameController.text,
+                        int.tryParse(_playerCountController.text)!,
+                        int.tryParse(_portController.text)!,
+                        int.tryParse(_beaconController.text)!,
+                      );
+                    }),
+              ],
+            )
           ],
         ),
       ),

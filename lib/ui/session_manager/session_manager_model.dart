@@ -12,10 +12,15 @@ import 'package:deverse_host_app/utils/injection_container.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+import '../../data/db/app_storage.dart';
+
 class SessionManagerModel extends BaseModel {
+  final AppCache _appStorage = container<AppCache>();
   List<SubWorldTemplate> templates = [];
-  final WorldTemplateRepository _worldTemplateRepository = container<WorldTemplateRepository>();
-  final WorldInstanceRepository _worldInstanceRepository = container<WorldInstanceRepository>();
+  final WorldTemplateRepository _worldTemplateRepository =
+      container<WorldTemplateRepository>();
+  final WorldInstanceRepository _worldInstanceRepository =
+      container<WorldInstanceRepository>();
 
   List<SubWorldConfig> savedConfigs = [];
   SubWorldTemplate? selectedTemplate;
@@ -31,20 +36,39 @@ class SessionManagerModel extends BaseModel {
       notifyListeners();
     });
     selectedTemplate = null;
-    savedConfigs = [
-      SubWorldConfig(1, SubWorldTheme(1, "Blizzard", "", "", "", 0, 0), "Nam", 8, 7777, 7877),
-      SubWorldConfig(2, SubWorldTheme(2, "Inferno", "", "", "", 0, 0), "Hieu", 18, 7777, 7877),
-      SubWorldConfig(3, SubWorldTheme(3, "Dungeon", "", "", "", 0, 0), "Thuan", 32, 7777, 7877),
-      SubWorldConfig(4, SubWorldTheme(4, "Dungeon", "", "", "", 0, 0), "Thuan", 32, 7777, 7877),
-      SubWorldConfig(5, SubWorldTheme(5, "Dungeon", "", "", "", 0, 0), "Thuan", 32, 7777, 7877),
-      SubWorldConfig(6, SubWorldTheme(6, "Blizzard", "", "", "", 0, 0), "Nam", 8, 7777, 7877),
-      SubWorldConfig(7, SubWorldTheme(7, "Inferno", "", "", "", 0, 0), "Hieu", 18, 7777, 7877),
-      SubWorldConfig(8, SubWorldTheme(8, "Dungeon", "", "", "", 0, 0), "Thuan", 32, 7777, 7877),
-      SubWorldConfig(9, SubWorldTheme(9, "Blizzard", "", "", "", 0, 0), "Nam", 8, 7777, 7877),
-      SubWorldConfig(10, SubWorldTheme(10, "Inferno", "", "", "", 0, 0), "Hieu", 18, 7777, 7877),
-      SubWorldConfig(11, SubWorldTheme(11, "Dungeon", "", "", "", 0, 0), "Thuan", 32, 7777, 7877),
-      SubWorldConfig(12, SubWorldTheme(12, "Dungeon", "", "", "", 0, 0), "Thuan", 32, 7777, 7877),
-    ];
+    loadConfigs().then((value) {
+      logsContainer.addLog(jsonEncode(value));
+
+      print(value);
+      savedConfigs = value;
+      notifyListeners();
+    });
+    // savedConfigs = [
+    //   SubWorldConfig(1, SubWorldTheme(1, "Blizzard", "", "", "", 0, 0), "Nam",
+    //       8, 7777, 7877),
+    //   SubWorldConfig(2, SubWorldTheme(2, "Inferno", "", "", "", 0, 0), "Hieu",
+    //       18, 7777, 7877),
+    //   SubWorldConfig(3, SubWorldTheme(3, "Dungeon", "", "", "", 0, 0), "Thuan",
+    //       32, 7777, 7877),
+    //   SubWorldConfig(4, SubWorldTheme(4, "Dungeon", "", "", "", 0, 0), "Thuan",
+    //       32, 7777, 7877),
+    //   SubWorldConfig(5, SubWorldTheme(5, "Dungeon", "", "", "", 0, 0), "Thuan",
+    //       32, 7777, 7877),
+    //   SubWorldConfig(6, SubWorldTheme(6, "Blizzard", "", "", "", 0, 0), "Nam",
+    //       8, 7777, 7877),
+    //   SubWorldConfig(7, SubWorldTheme(7, "Inferno", "", "", "", 0, 0), "Hieu",
+    //       18, 7777, 7877),
+    //   SubWorldConfig(8, SubWorldTheme(8, "Dungeon", "", "", "", 0, 0), "Thuan",
+    //       32, 7777, 7877),
+    //   SubWorldConfig(9, SubWorldTheme(9, "Blizzard", "", "", "", 0, 0), "Nam",
+    //       8, 7777, 7877),
+    //   SubWorldConfig(10, SubWorldTheme(10, "Inferno", "", "", "", 0, 0), "Hieu",
+    //       18, 7777, 7877),
+    //   SubWorldConfig(11, SubWorldTheme(11, "Dungeon", "", "", "", 0, 0),
+    //       "Thuan", 32, 7777, 7877),
+    //   SubWorldConfig(12, SubWorldTheme(12, "Dungeon", "", "", "", 0, 0),
+    //       "Thuan", 32, 7777, 7877),
+    // ];
   }
 
   void onSelectTemplate(SubWorldTemplate template) {
@@ -52,12 +76,19 @@ class SessionManagerModel extends BaseModel {
     notifyListeners();
   }
 
-  void onLaunchVerse(String verseName, String maxPlayerCount, String port, String beaconPort) {
-    if (selectedTemplate == null || verseName.isEmpty || maxPlayerCount.isEmpty || port.isEmpty || beaconPort.isEmpty) {
-      logsContainer.addLog("Invalid Input, please check your inputs before launching a verse...");
+  void onLaunchVerse(
+      String verseName, String maxPlayerCount, String port, String beaconPort) {
+    if (selectedTemplate == null ||
+        verseName.isEmpty ||
+        maxPlayerCount.isEmpty ||
+        port.isEmpty ||
+        beaconPort.isEmpty) {
+      logsContainer.addLog(
+          "Invalid Input, please check your inputs before launching a verse...");
       return;
     }
-    _createInstance(verseName, maxPlayerCount, port, beaconPort, (int createdInstanceId) {
+    _createInstance(verseName, maxPlayerCount, port, beaconPort,
+        (int createdInstanceId) {
       _runServer(verseName, port, beaconPort, createdInstanceId);
     });
   }
@@ -71,8 +102,12 @@ class SessionManagerModel extends BaseModel {
     });
   }
 
-  void _createInstance(String verseName, String maxPlayerCount, String port, String beaconPort, Function onInstanceCreated) {
-    _worldInstanceRepository.createInstance(selectedTemplate!, verseName, "vn", maxPlayerCount, port, beaconPort).then((res) {
+  void _createInstance(String verseName, String maxPlayerCount, String port,
+      String beaconPort, Function onInstanceCreated) {
+    _worldInstanceRepository
+        .createInstance(selectedTemplate!, verseName, "vn", maxPlayerCount,
+            port, beaconPort)
+        .then((res) {
       if (res.isFailure) {
         logsContainer.addLog(res.error.toString());
         return;
@@ -82,10 +117,12 @@ class SessionManagerModel extends BaseModel {
     });
   }
 
-  void _runServer(String verseName, String port, String beaconPort, int createdInstanceId) async {
+  void _runServer(String verseName, String port, String beaconPort,
+      int createdInstanceId) async {
     var path = "${Directory.current.path}/DeverseServer/DeverseServer.exe";
     if (kDebugMode) {
-      path = "${Directory.current.path}/build/windows/runner/Debug/DeverseServer/DeverseServer.exe";
+      path =
+          "${Directory.current.path}/build/windows/runner/Debug/DeverseServer/DeverseServer.exe";
     }
     var process = await Process.start(
         path,
@@ -94,7 +131,7 @@ class SessionManagerModel extends BaseModel {
           "-log",
           "-Port=$port",
           "-BeaconPort=$beaconPort"
-          "-IsMainVerse=deverse.world",
+              "-IsMainVerse=deverse.world",
           "-DevVerse=dev.deverse.world",
           "-HostName=$verseName",
           "-ImageUrl=${selectedTemplate!.thumbnail_centralized_uri}",
@@ -123,11 +160,40 @@ class SessionManagerModel extends BaseModel {
       print(element);
     });
     process.exitCode.then((value) {
-      var deletingInstance = instances.firstWhere((element) => element.id == createdInstanceId);
+      var deletingInstance =
+          instances.firstWhere((element) => element.id == createdInstanceId);
       instances.removeWhere((element) => element.id == createdInstanceId);
       onDeleteVerse(deletingInstance);
-      logsContainer.addLog("Instance '$createdInstanceId' Instance was closed by user.");
+      logsContainer
+          .addLog("Instance '$createdInstanceId' Instance was closed by user.");
       notifyListeners();
     });
+  }
+
+  void onSaveConfig(String verName, int maxCount, int port, int beacon) async {
+    final configs = await loadConfigs();
+    final config = SubWorldConfig(
+        configs.length + 1,
+        SubWorldTheme(configs.length + 1, "${verName} ${configs.length + 1}",
+            "", "", "", 0, 0),
+        verName,
+        maxCount,
+        port,
+        beacon);
+    configs.add(config);
+    logsContainer.addLog("111${jsonEncode(configs)}");
+    _appStorage.save("configs", jsonEncode(configs));
+    savedConfigs = configs;
+    notifyListeners();
+  }
+
+  Future<List<SubWorldConfig>> loadConfigs() async {
+    final json = await _appStorage.get<String>("configs");
+    logsContainer.addLog("222${json}");
+    if (json == null) return [];
+    final configs = jsonDecode(json);
+    return (configs as List<dynamic>)
+        .map((e) => SubWorldConfig.fromJson(e))
+        .toList();
   }
 }

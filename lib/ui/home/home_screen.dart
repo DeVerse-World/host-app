@@ -109,29 +109,33 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                     child: const Text("Authenticate"));
               }
-              return Row(
-                children: [
-                  SizedBox(
-                    width: 80,
-                    child: FilledButton(
-                      onPressed: () {
-                        if (_selectedTemplate != null) {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => SessionManagerScreen(
-                                  rootTemplate: _selectedTemplate!)));
-                        }
-                      },
-                      child: const Text("Next"),
-                    ),
+              return Row(children: [
+                SizedBox(
+                  width: 80,
+                  child: FilledButton(
+                    onPressed: () {
+                      if (_selectedTemplate != null) {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => SessionManagerScreen(
+                                rootTemplate: _selectedTemplate!)));
+                      }
+                    },
+                    child: const Text("Next"),
                   ),
-                  const SizedBox(width: 20  ,),
-                  Button(
-                      onPressed: () {
-                        _model.logout();
-                      },
-                      child: const Text("Logout")),
-                ]
-              );
+                ),
+                const SizedBox(
+                  width: 20,
+                ),
+                SizedBox(
+                  width: 80,
+                  child: Button(
+                    onPressed: () {
+                      _model.logout();
+                    },
+                    child: const Text("Logout"),
+                  ),
+                ),
+              ]);
             },
           ),
           const Expanded(child: SizedBox()),
