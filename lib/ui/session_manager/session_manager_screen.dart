@@ -299,7 +299,7 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
               style: TextStyle(fontSize: 10),
             ),
             Consumer<SessionManagerModel>(builder: (context, model, child) {
-              if (model.templates.isEmpty) {
+              if (model.savedConfigs.isEmpty) {
                 return const SizedBox.shrink();
               }
               return DropDownButton(
