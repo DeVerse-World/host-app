@@ -189,7 +189,6 @@ class SessionManagerModel extends BaseModel {
 
   Future<List<SubWorldConfig>> loadConfigs() async {
     final json = await _appStorage.get<String>("configs");
-    logsContainer.addLog("222${json}");
     if (json == null) return [];
     final configs = jsonDecode(json);
     return (configs as List<dynamic>)

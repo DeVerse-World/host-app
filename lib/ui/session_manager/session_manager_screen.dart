@@ -174,8 +174,8 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
                         height: 8,
                       ),
                       const Text(
-                        "Choose saved config",
-                        style: TextStyle(fontSize: 10),
+                        "Load saved config",
+                        style: TextStyle(fontWeight: FontWeight.w500),
                       ),
                       Consumer<SessionManagerModel>(builder: (context, model, child) {
                         if (model.savedConfigs.isEmpty) {
@@ -235,7 +235,7 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           FilledButton(
-                              child: const Text("Save"),
+                              child: const Text("Save config"),
                               onPressed: () {
                                 setState(() {
                                   _vernameError = _vernameController.text.isEmpty;
