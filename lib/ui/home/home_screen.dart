@@ -27,28 +27,6 @@ class _HomeScreenState extends State<HomeScreen> {
     Provider.of<HomeModel>(context, listen: false).initData();
   }
 
-  Widget _buildTemplateList(List<SubWorldTemplate> templates) {
-    return Wrap(
-      direction: Axis.vertical,
-      spacing: 12,
-      children: templates
-          .map((template) => RadioButton(
-              // style: RadioButtonThemeData(
-              //   checkedDecoration: ButtonState.resolveWith((states) => {
-              //
-              //   })
-              // ),
-              checked: _selectedTemplate?.id == template.id,
-              content: Text(template.display_name),
-              onChanged: (value) {
-                setState(() {
-                  _selectedTemplate = template;
-                });
-              }))
-          .toList(),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return NavigationView(
@@ -81,10 +59,28 @@ class _HomeScreenState extends State<HomeScreen> {
                           children: [
                             Consumer<HomeModel>(
                               builder: (context, model, child) {
-                                if (model.isAuthenticated) {
-                                  return _buildTemplateList(model.templates);
+                                if (!model.isAuthenticated) {
+                                  return const Text("Please login first");
                                 }
-                                return const Text("Please login first");
+                                return Wrap(
+                                  direction: Axis.vertical,
+                                  spacing: 12,
+                                  children: model.templates
+                                      .map((template) => RadioButton(
+                                    // style: RadioButtonThemeData(
+                                    //   checkedDecoration: ButtonState.resolveWith((states) => {
+                                    //
+                                    //   })
+                                    // ),
+                                      checked: _selectedTemplate?.id == template.id,
+                                      content: Text(template.display_name),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _selectedTemplate = template;
+                                        });
+                                      }))
+                                      .toList(),
+                                );
                               },
                             ),
                           ],
