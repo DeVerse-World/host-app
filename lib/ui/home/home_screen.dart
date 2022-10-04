@@ -29,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = FluentTheme.of(context);
     return NavigationView(
         content: Padding(
       padding: const EdgeInsets.all(8.0),
@@ -49,8 +50,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   Container(
                     decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey, width: 0.1),
-                        color: Colors.white),
+                      border: Border.all(color: theme.borderInputColor, width: 0.1),
+                      color: theme.scaffoldBackgroundColor
+                    ),
                     padding: const EdgeInsets.all(8),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -67,18 +69,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                   spacing: 12,
                                   children: model.templates
                                       .map((template) => RadioButton(
-                                    // style: RadioButtonThemeData(
-                                    //   checkedDecoration: ButtonState.resolveWith((states) => {
-                                    //
-                                    //   })
-                                    // ),
-                                      checked: _selectedTemplate?.id == template.id,
-                                      content: Text(template.display_name),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          _selectedTemplate = template;
-                                        });
-                                      }))
+                                          // style: RadioButtonThemeData(
+                                          //   checkedDecoration: ButtonState.resolveWith((states) => {
+                                          //
+                                          //   })
+                                          // ),
+                                          checked: _selectedTemplate?.id ==
+                                              template.id,
+                                          content: Text(template.display_name),
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _selectedTemplate = template;
+                                            });
+                                          }))
                                       .toList(),
                                 );
                               },

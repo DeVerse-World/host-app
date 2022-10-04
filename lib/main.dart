@@ -22,10 +22,7 @@ void main() async {
     // await WindowManager.instance.ensureInitialized();
   }
   // await EasyLocalization.ensureInitialized();
-  var initJobs = <Future>[
-    initDIContainer(),
-    dotenv.load(fileName: ".env")
-  ];
+  var initJobs = <Future>[initDIContainer(), dotenv.load(fileName: ".env")];
   Future.wait(initJobs).then((value) {
     runApp(const MyApp());
   });
@@ -44,12 +41,17 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider(create: (context) => SettingsModel()),
         ],
         child: FluentApp(
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.getTheme(),
-          routes: {
-            SessionManagerScreen.route: (context) => const SessionManagerScreen(rootTemplate: null),
-            SettingsScreen.route: (context) => const SettingsScreen()},
-          home: const HomeScreen(),
-        ));
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.getTheme(),
+            darkTheme: AppTheme.getDarkTheme(),
+            themeMode: ThemeMode.system,
+            routes: {
+              SessionManagerScreen.route: (context) =>
+                  const SessionManagerScreen(rootTemplate: null),
+              SettingsScreen.route: (context) => const SettingsScreen()
+            },
+            home: const HomeScreen(),
+          ),
+        );
   }
 }
