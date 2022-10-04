@@ -17,6 +17,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     setWindowMinSize(const Size(1200, 700));
+    setWindowTitle("Deverse World Host Manager");
     // setWindowMaxSize(const Size(800, 800));
     // await flutter_acrylic.Window.initialize();
     // await WindowManager.instance.ensureInitialized();

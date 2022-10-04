@@ -9,13 +9,17 @@ class WorldTemplateRepository extends BaseRepository {
 
   Future<List<SubWorldTemplate>> getRootTemplates() async {
     var res = await _subWorldService.getRootSubWorlds(null);
-    logsContainer.addLog("Fetched ${res.data?.subworld_templates.length ?? 0} Templates");
+    if (res.isFailure) {
+      logsContainer.addLog(res.error.toString());
+    }
     return res.data?.subworld_templates ?? [];
   }
 
   Future<List<SubWorldTemplate>> getSubTemplates(SubWorldTemplate rootTemplate) async {
     var res = await _subWorldService.getSubSubWorlds(null, rootTemplate.id);
-    logsContainer.addLog("Fetched ${res.data?.subworld_templates.length ?? 0} Sub Templates");
+    if (res.isFailure) {
+      logsContainer.addLog(res.error.toString());
+    }
     return res.data?.subworld_templates ?? [];
   }
 }

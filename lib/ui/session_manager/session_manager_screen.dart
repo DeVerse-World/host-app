@@ -149,7 +149,7 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        "Verse name",
+                        "World name",
                         style: TextStyle(fontWeight: FontWeight.w500),
                       ),
                       const SizedBox(height: 8),
@@ -196,7 +196,7 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
                         }
                         return DropDownButton(
                           title:
-                              Text(_selectedConfig?.name ?? "Tap to select..."),
+                              Text(_selectedConfig?.name ?? "Tap to load saved config..."),
                           items: model.savedConfigs
                               .map((template) => MenuFlyoutItem(
                                   text: Text(template.name),

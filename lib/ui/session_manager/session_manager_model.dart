@@ -37,9 +37,6 @@ class SessionManagerModel extends BaseModel {
     });
     selectedTemplate = null;
     loadConfigs().then((value) {
-      logsContainer.addLog(jsonEncode(value));
-
-      print(value);
       savedConfigs = value;
       notifyListeners();
     });
