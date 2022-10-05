@@ -42,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Center(
               child: IconButton(
-                icon: const Icon(FluentIcons.settings),
+                icon: const Icon(FluentIcons.settings, size: 24),
                 onPressed: () {
                   Navigator.of(context).pushNamed(SettingsScreen.route);
                 },

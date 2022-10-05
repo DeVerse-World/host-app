@@ -47,7 +47,7 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             theme: AppTheme.getTheme(),
             darkTheme: AppTheme.getDarkTheme(),
-            themeMode: model.getThemeMode(),
+            themeMode: model.themeMode,
             routes: {
               SessionManagerScreen.route: (context) =>
                   const SessionManagerScreen(rootTemplate: null),

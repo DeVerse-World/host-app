@@ -37,15 +37,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             child: ListTile(
               tileColor: theme.menuColor,
-              leading: Icon(FluentIcons.pencil_reply),
-              title: Text("Dark theme"),
-              subtitle: Text("Click to switch themes"),
-              trailing: ToggleSwitch(
-                checked: settingModel.getThemeMode() == ThemeMode.dark,
-                onChanged: (value) {
-                  settingModel.setDarkTheme(value);
-                },
-              ),
+              leading: const Icon(FluentIcons.pencil_reply),
+              title: const Text("App theme"),
+              subtitle: const Text("Toggle to switch theme"),
+              trailing: Row(
+                children: [
+                  Text(settingModel.currentMode),
+                  ToggleSwitch(
+                    checked: settingModel.themeMode == ThemeMode.dark,
+                    onChanged: (value) {
+                      settingModel.setTheme(value);
+                    },
+                  )
+                ],
+              ) ,
             ),
           )
         ],
