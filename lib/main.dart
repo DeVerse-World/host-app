@@ -36,23 +36,27 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (context) => HomeModel()),
-          ChangeNotifierProvider(create: (context) => SessionManagerModel()),
-          ChangeNotifierProvider(create: (context) => SettingsModel()),
-        ],
-        child: FluentApp(
+      providers: [
+        ChangeNotifierProvider(create: (context) => HomeModel()),
+        ChangeNotifierProvider(create: (context) => SessionManagerModel()),
+        ChangeNotifierProvider(create: (context) => SettingsModel()),
+      ],
+      child: Consumer<SettingsModel>(
+        builder: (context, model, child) {
+          return FluentApp(
             debugShowCheckedModeBanner: false,
             theme: AppTheme.getTheme(),
             darkTheme: AppTheme.getDarkTheme(),
-            themeMode: ThemeMode.system,
+            themeMode: model.getThemeMode(),
             routes: {
               SessionManagerScreen.route: (context) =>
                   const SessionManagerScreen(rootTemplate: null),
               SettingsScreen.route: (context) => const SettingsScreen()
             },
             home: const HomeScreen(),
-          ),
-        );
+          );
+        },
+      ),
+    );
   }
 }
