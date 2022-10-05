@@ -20,14 +20,14 @@ class UserService extends BaseService {
     return data.login_url;
   }
 
-  Future<PollLoginResponse> pollLoginLink(String key) async {
+  Future<User> pollLoginLink(String key) async {
     var uri = "$_baseUrl/pollLoginLink/$key";
     var response = await http.get(Uri.parse(uri));
     if (response.headers['set-cookie'] != null) {
       var cookieString = response.headers['set-cookie']!.replaceAll(";", "").split(" ");
       saveCookie(cookieString.elementAt(0));
     }
-    var data = PollLoginResponse.fromJson(json.decode(utf8.decode(response.bodyBytes)));
+    var data = User.fromJson(json.decode(utf8.decode(response.bodyBytes)));
     return data;
   }
 

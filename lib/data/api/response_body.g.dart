@@ -6,8 +6,8 @@ part of 'response_body.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-PollLoginResponse _$PollLoginResponseFromJson(Map<String, dynamic> json) =>
-    PollLoginResponse(
+User _$PollLoginResponseFromJson(Map<String, dynamic> json) =>
+    User(
       json['id'] as int?,
       json['custom_email'] as String?,
       json['social_email'] as String?,
@@ -19,7 +19,7 @@ PollLoginResponse _$PollLoginResponseFromJson(Map<String, dynamic> json) =>
       json['error'] as String?,
     );
 
-Map<String, dynamic> _$PollLoginResponseToJson(PollLoginResponse instance) =>
+Map<String, dynamic> _$PollLoginResponseToJson(User instance) =>
     <String, dynamic>{
       'id': instance.id,
       'custom_email': instance.custom_email,

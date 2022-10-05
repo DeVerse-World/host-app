@@ -9,10 +9,19 @@ import 'package:deverse_host_app/services/user_service.dart';
 class UserRepository extends BaseRepository {
   final UserService _userService;
   final AuthService _authService;
+
   //https://staging.deverse.world/login?key=OwGpDJHRbb
   UserRepository(this._userService, this._authService);
 
-  Future<Result<PollLoginResponse?, Exception>> authenticateSession(bool forceReload) {
+  User? _user;
+
+  User? get user => _user;
+
+  bool get isAuthenticated => _user != null;
+
+  String get walletAddress => _user?.wallet_address ?? "";
+
+  Future<Result<User?, Exception>> authenticateSession(bool forceReload) {
     return getResult(() async {
       var loginKey = await _userService.getLoginKey();
       if (loginKey == null || forceReload) {
@@ -26,7 +35,7 @@ class UserRepository extends BaseRepository {
       try {
         const delayTime = Duration(seconds: 15);
         logsContainer.addLog("Using login key : $loginKey");
-        PollLoginResponse? res;
+        User? res;
         var loginOnce = false;
         var tryCount = 15;
         while (tryCount > 0) {
@@ -40,6 +49,7 @@ class UserRepository extends BaseRepository {
             await Future.delayed(delayTime);
           } else {
             res = data;
+            _user = data;
             break;
           }
           tryCount--;
@@ -50,5 +60,9 @@ class UserRepository extends BaseRepository {
       }
       return null;
     });
+  }
+
+  void logout() {
+    _user = null;
   }
 }

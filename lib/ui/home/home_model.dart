@@ -7,9 +7,9 @@ import '../../utils/injection_container.dart';
 
 class HomeModel extends BaseModel {
   List<SubWorldTemplate> templates = [];
-  bool isAuthenticated = false;
   final WorldTemplateRepository _worldTemplateRepository = container<WorldTemplateRepository>();
   final UserRepository _userRepository = container<UserRepository>();
+  bool isAuthenticated = false;
 
   void initData() {
     authenticate(false);
@@ -23,15 +23,15 @@ class HomeModel extends BaseModel {
     _userRepository.authenticateSession(forceClearCache).then((value) {
       if (value.data != null) {
         logsContainer.addLog("Authorized...");
-        isAuthenticated = true;
-        logsContainer.addLog("Wallet address: ${value.data?.wallet_address}");
+        isAuthenticated = _userRepository.isAuthenticated;
         notifyListeners();
       }
     });
   }
 
   void logout() {
-    isAuthenticated = false;
+    _userRepository.logout();
+    isAuthenticated = _userRepository.isAuthenticated;
     notifyListeners();
   }
 }

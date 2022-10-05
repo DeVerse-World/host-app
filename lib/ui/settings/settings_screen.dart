@@ -18,7 +18,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return NavigationView(
       appBar: NavigationAppBar(
         // backgroundColor: theme.scaffoldBackgroundColor,
-        title: Text("Setting"),
+        title: const Text("Setting"),
         leading: Center(
           child: IconButton(
             icon: const Icon(FluentIcons.back),
