@@ -14,6 +14,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final settingModel = context.watch<SettingsModel>();
+    final theme = FluentTheme.of(context);
     return NavigationView(
       appBar: NavigationAppBar(
         // backgroundColor: theme.scaffoldBackgroundColor,
@@ -29,15 +30,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       content: Column(
         children: [
-          ListTile(
-            leading: Icon(FluentIcons.pencil_reply),
-            title: Text("Dark theme"),
-            subtitle: Text("Click to switch themes"),
-            trailing: ToggleSwitch(
-              checked: settingModel.getThemeMode() == ThemeMode.dark,
-              onChanged: (value) {
-                settingModel.setDarkTheme(value);
-              },
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12.0,
+              vertical: 6.0,
+            ),
+            child: ListTile(
+              tileColor: theme.menuColor,
+              leading: Icon(FluentIcons.pencil_reply),
+              title: Text("Dark theme"),
+              subtitle: Text("Click to switch themes"),
+              trailing: ToggleSwitch(
+                checked: settingModel.getThemeMode() == ThemeMode.dark,
+                onChanged: (value) {
+                  settingModel.setDarkTheme(value);
+                },
+              ),
             ),
           )
         ],
