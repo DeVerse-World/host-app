@@ -128,7 +128,6 @@ class SessionManagerModel extends BaseModel {
           "-log",
           "-Port=$port",
           "-BeaconPort=$beaconPort"
-              "-IsMainVerse=deverse.world",
           "-DevVerse=dev.deverse.world",
           "-HostName=$verseName",
           "-ImageUrl=${selectedTemplate!.thumbnail_centralized_uri}",
