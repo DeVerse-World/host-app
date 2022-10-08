@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.cosugames" "\0"
-            VALUE "FileDescription", "Deverse" "\0"
+            VALUE "FileDescription", "Deverse World Host Manager" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "Deverse" "\0"
+            VALUE "InternalName", "Deverse World Host Manager" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2022 com.cosugames. All rights reserved." "\0"
-            VALUE "OriginalFilename", "Deverse.exe" "\0"
-            VALUE "ProductName", "Deverse" "\0"
+            VALUE "OriginalFilename", "Deverse World Host Manager.exe" "\0"
+            VALUE "ProductName", "Deverse World Host Manager" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
