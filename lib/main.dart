@@ -17,15 +17,13 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     setWindowMinSize(const Size(1200, 700));
+    setWindowTitle("Deverse World Host Manager");
     // setWindowMaxSize(const Size(800, 800));
     // await flutter_acrylic.Window.initialize();
     // await WindowManager.instance.ensureInitialized();
   }
   // await EasyLocalization.ensureInitialized();
-  var initJobs = <Future>[
-    initDIContainer(),
-    dotenv.load(fileName: ".env")
-  ];
+  var initJobs = <Future>[initDIContainer(), dotenv.load(fileName: ".env")];
   Future.wait(initJobs).then((value) {
     runApp(const MyApp());
   });
@@ -38,18 +36,27 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (context) => HomeModel()),
-          ChangeNotifierProvider(create: (context) => SessionManagerModel()),
-          ChangeNotifierProvider(create: (context) => SettingsModel()),
-        ],
-        child: FluentApp(
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.getTheme(),
-          routes: {
-            SessionManagerScreen.route: (context) => const SessionManagerScreen(rootTemplate: null),
-            SettingsScreen.route: (context) => const SettingsScreen()},
-          home: const HomeScreen(),
-        ));
+      providers: [
+        ChangeNotifierProvider(create: (context) => HomeModel()),
+        ChangeNotifierProvider(create: (context) => SessionManagerModel()),
+        ChangeNotifierProvider(create: (context) => SettingsModel()),
+      ],
+      child: Consumer<SettingsModel>(
+        builder: (context, model, child) {
+          return FluentApp(
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.getTheme(),
+            darkTheme: AppTheme.getDarkTheme(),
+            themeMode: model.themeMode,
+            routes: {
+              SessionManagerScreen.route: (context) =>
+                  const SessionManagerScreen(rootTemplate: null),
+              SettingsScreen.route: (context) => const SettingsScreen()
+            },
+            home: const HomeScreen(),
+          );
+        },
+      ),
+    );
   }
 }
