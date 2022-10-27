@@ -18,18 +18,11 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  final UserRepository _userRepository = container<UserRepository>();
-
-  Future<bool> _updateProfile(String name) async {
-    print(name);
-    await Future.delayed(const Duration(seconds: 4));
-    return true;
-  }
 
   @override
   Widget build(BuildContext context) {
     final settingModel = context.watch<SettingsModel>();
-    final _user = _userRepository.user;
+    final user = settingModel.user;
     final theme = FluentTheme.of(context);
     return NavigationView(
       appBar: NavigationAppBar(
@@ -46,7 +39,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       content: Column(
         children: [
-          _user != null
+          user != null
               ? Row(
                   children: [
                     const SizedBox(width: 8.0),
@@ -61,15 +54,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          _user.name.orNull() ?? "Anonymous",
+                          user.name.orNull() ?? "Anonymous",
                           style: const TextStyle(
                               fontSize: 16, fontWeight: FontWeight.bold),
                         ),
-                        _user.wallet_address.orNull() != null
-                            ? Text(_user.wallet_address ?? "")
+                        user.wallet_address.orNull() != null
+                            ? Text(user.wallet_address ?? "")
                             : const SizedBox(),
-                        _user.custom_email.orNull() != null
-                            ? Text(_user.custom_email ?? "")
+                        user.custom_email.orNull() != null
+                            ? Text(user.custom_email ?? "")
                             : const SizedBox(),
                         TextButton(
                           onPressed: () {
@@ -125,8 +118,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _profileDialog({
     required BuildContext context,
   }) {
-    final UserRepository userRepository = container<UserRepository>();
-    final user = userRepository.user;
+    final settingModel = context.watch<SettingsModel>();
+    final user = settingModel.user;
     final TextEditingController editNameController = TextEditingController();
     final currentName = (user?.name?.isEmpty ?? true)
         ? "You haven't set name yet"
@@ -171,7 +164,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             setState(() {
                               isLoading = true;
                             });
-                            final result = await _userRepository
+                            final result = await settingModel
                                 .updateProfile(editNameController.text);
                             setState(() {
                               error = result.isFailure
@@ -179,6 +172,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   : "";
                               isLoading = false;
                             });
+                            if(result.isSuccess){
+                              Navigator.of(context).pop();
+                            }
                           },
                         )
                       : const Padding(
