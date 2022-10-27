@@ -71,3 +71,13 @@ class SubWorldInstancesData {
 
   Map<String, dynamic> toJson() => _$SubWorldInstancesDataToJson(this);
 }
+
+@JsonSerializable()
+class UserRequestBody {
+  String name;
+  UserRequestBody(this.name);
+
+  factory UserRequestBody.fromJson(Map<String, dynamic> json) =>_$UserRequestBodyFromJson(json);
+
+  Map<String, dynamic> toJson() => _$UserRequestBodyToJson(this);
+}

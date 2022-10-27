@@ -83,3 +83,13 @@ Map<String, dynamic> _$SubWorldInstancesDataToJson(
     <String, dynamic>{
       'subworld_instances': instance.subworld_instances,
     };
+
+UserRequestBody _$UserRequestBodyFromJson(Map<String, dynamic> json) =>
+    UserRequestBody(
+      json['name'] as String,
+    );
+
+Map<String, dynamic> _$UserRequestBodyToJson(UserRequestBody instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+    };

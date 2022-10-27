@@ -17,7 +17,17 @@ class User {
   User(
       this.id, this.custom_email, this.social_email, this.wallet_address, this.wallet_nonce, this.name, this.created_at, this.updated_at, this.error);
 
-  factory User.fromJson(Map<String, dynamic> json) => _$PollLoginResponseFromJson(json);
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
-  Map<String, dynamic> toJson() => _$PollLoginResponseToJson(this);
+  Map<String, dynamic> toJson() => _$UserToJson(this);
+}
+
+@JsonSerializable()
+class UserResponse {
+  User user;
+
+  UserResponse(this.user);
+  factory UserResponse.fromJson(Map<String, dynamic> json) => _$UserResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$UserResponseToJson(this);
 }
