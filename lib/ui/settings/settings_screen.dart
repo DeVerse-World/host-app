@@ -79,9 +79,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   false, // user must tap button!
                               builder: (BuildContext context) {
                                 return _profileDialog(
-                                    context: context,
-                                    updateProfile: _updateProfile,
-                                    user: _user);
+                                  context: context,
+                                );
                               },
                             );
                           },
@@ -125,25 +124,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Widget _profileDialog({
     required BuildContext context,
-    User? user,
-    required Future<bool> Function(String) updateProfile,
   }) {
+    final UserRepository userRepository = container<UserRepository>();
+    final user = userRepository.user;
     final TextEditingController editNameController = TextEditingController();
-    final currentName = user?.name.orNull() ?? "Anonymous";
+    final currentName = (user?.name?.isEmpty ?? true)
+        ? "You haven't set name yet"
+        : 'Current name: ${user!.name!}';
     bool isLoading = false;
+    String error = "";
     return StatefulBuilder(builder: (context, setState) {
       return ContentDialog(
         title: const Text('Update your profile'),
         content: SingleChildScrollView(
           child: ListBody(
             children: [
-              Text('Current name: $currentName'),
+              Text(currentName),
               const SizedBox(
                 height: 8,
               ),
               TextBox(
                 controller: editNameController,
               ),
+              error.isNotEmpty
+                  ? Text(
+                      error,
+                      style: TextStyle(color: Colors.red),
+                    )
+                  : const SizedBox(),
               const SizedBox(
                 height: 8,
               ),
@@ -154,11 +162,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ? TextButton(
                           child: const Text('Next'),
                           onPressed: () async {
+                            if(editNameController.text.isEmpty){
+                              setState(() {
+                                error = "Invalid name";
+                              });
+                              return;
+                            }
                             setState(() {
                               isLoading = true;
                             });
-                            await updateProfile.call(editNameController.text);
+                            final result = await _userRepository
+                                .updateProfile(editNameController.text);
                             setState(() {
+                              error = result.isFailure
+                                  ? result.error.toString()
+                                  : "";
                               isLoading = false;
                             });
                           },

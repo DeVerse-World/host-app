@@ -62,6 +62,10 @@ class UserRepository extends BaseRepository {
     });
   }
 
+  Future<Result<UserResponse, Exception>> updateProfile(String name) async {
+    return await _userService.updateProfile(name);
+  }
+
   void logout() {
     _user = null;
   }
