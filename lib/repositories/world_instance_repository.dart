@@ -11,8 +11,8 @@ class WorldInstanceRepository extends BaseRepository {
 
   WorldInstanceRepository(this._subWorldService);
 
-  Future<List<SubWorldInstance>> fetchInstances() async {
-    var res = await _subWorldService.fetchInstances(null);
+  Future<List<SubWorldInstance>> fetchInstances(int? userId) async {
+    var res = await _subWorldService.fetchInstances(userId);
     return res.data?.subworld_instances ?? [];
   }
 

@@ -43,7 +43,7 @@ class SubWorldService extends BaseService {
   Future<Result<SubWorldInstancesData, Exception>> fetchInstances(int? userId) async {
     var uri = "$_baseUrl/instance";
     if (userId != null) {
-      uri = "$uri?userId=$userId";
+      uri = "$uri?user_id=$userId";
     }
     return getResult(() async {
       var res = await http.get(Uri.parse(uri));
