@@ -5,6 +5,7 @@ import 'package:deverse_host_app/data/models/sub_world_config.dart';
 import 'package:deverse_host_app/data/models/sub_world_instance.dart';
 import 'package:deverse_host_app/data/models/sub_world_template.dart';
 import 'package:deverse_host_app/data/models/sub_world_theme.dart';
+import 'package:deverse_host_app/repositories/user_repository.dart';
 import 'package:deverse_host_app/repositories/world_instance_repository.dart';
 import 'package:deverse_host_app/repositories/world_template_repository.dart';
 import 'package:deverse_host_app/ui/base_change_notifier.dart';
@@ -17,6 +18,7 @@ import '../../data/db/app_storage.dart';
 class SessionManagerModel extends BaseModel {
   final AppCache _appStorage = container<AppCache>();
   List<SubWorldTemplate> templates = [];
+  final UserRepository _userRepository = container<UserRepository>();
   final WorldTemplateRepository _worldTemplateRepository =
       container<WorldTemplateRepository>();
   final WorldInstanceRepository _worldInstanceRepository =
@@ -26,12 +28,14 @@ class SessionManagerModel extends BaseModel {
   SubWorldTemplate? selectedTemplate;
   List<SubWorldInstance> instances = [];
 
+  final Map<int, Process> _processes = {};
+
   void initData(SubWorldTemplate rootTemplate) {
     _worldTemplateRepository.getSubTemplates(rootTemplate).then((value) {
       templates = value;
       notifyListeners();
     });
-    _worldInstanceRepository.fetchInstances().then((value) {
+    _worldInstanceRepository.fetchInstances(_userRepository.user?.id).then((value) {
       instances = value;
       notifyListeners();
     });
@@ -65,6 +69,10 @@ class SessionManagerModel extends BaseModel {
   }
 
   void onDeleteVerse(SubWorldInstance subWorldInstance) {
+    if (_processes.containsKey(subWorldInstance.id)) {
+      _processes[subWorldInstance.id]?.kill();
+    }
+    _processes.removeWhere((key, value) => key == subWorldInstance.id);
     _worldInstanceRepository.deleteInstance(subWorldInstance).then((value) {
       if (value.isSuccess) {
         instances.removeWhere((element) => element.id == subWorldInstance.id);
@@ -103,6 +111,7 @@ class SessionManagerModel extends BaseModel {
           "-Port=$port",
           "-BeaconPort=$beaconPort"
           "-DevVerse=dev.deverse.world",
+          "-author=${_userRepository.user?.name ?? "Anonymous"}",
           "-HostName=$verseName",
           "-ImageUrl=${selectedTemplate!.thumbnail_centralized_uri}",
           "-InstanceId=${createdInstanceId.toString()}",
@@ -113,6 +122,7 @@ class SessionManagerModel extends BaseModel {
               "&"
         ],
         runInShell: true);
+    _processes[createdInstanceId] = process;
     process.stdout.transform(utf8.decoder).forEach((element) {
       // print(element);
       // if (element.contains("Successfully")) {
@@ -151,7 +161,7 @@ class SessionManagerModel extends BaseModel {
         port,
         beacon);
     configs.add(config);
-    logsContainer.addLog("111${jsonEncode(configs)}");
+    // logsContainer.addLog("111${jsonEncode(configs)}");
     _appStorage.save("configs", jsonEncode(configs));
     savedConfigs = configs;
     notifyListeners();

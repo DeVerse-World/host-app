@@ -25,7 +25,8 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
   final ScrollController _scrollController = ScrollController();
 
   final TextEditingController _vernameController = TextEditingController();
-  final TextEditingController _playerCountController = TextEditingController();
+  final TextEditingController _playerCountController =
+      TextEditingController(text: "8");
   final TextEditingController _portController =
       TextEditingController(text: "7777");
   final TextEditingController _beaconController =
@@ -195,8 +196,8 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
                           return const SizedBox.shrink();
                         }
                         return DropDownButton(
-                          title:
-                              Text(_selectedConfig?.name ?? "Tap to load saved config..."),
+                          title: Text(_selectedConfig?.name ??
+                              "Tap to load saved config..."),
                           items: model.savedConfigs
                               .map((template) => MenuFlyoutItem(
                                   text: Text(template.name),
@@ -253,11 +254,15 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
                           FilledButton(
                               child: const Text("Save config"),
                               onPressed: () {
+                                final maxPlayer =
+                                    int.tryParse(_playerCountController.text);
                                 setState(() {
                                   _vernameError =
                                       _vernameController.text.isEmpty;
                                   _maxPlayerError =
-                                      _playerCountController.text.isEmpty;
+                                      _playerCountController.text.isEmpty ||
+                                          maxPlayer == null ||
+                                          maxPlayer <= 0;
                                 });
                                 if (_vernameError || _maxPlayerError) return;
                                 _model.onSaveConfig(
