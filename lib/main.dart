@@ -23,7 +23,7 @@ void main() async {
     // await WindowManager.instance.ensureInitialized();
   }
   // await EasyLocalization.ensureInitialized();
-  var initJobs = <Future>[initDIContainer(), dotenv.load(fileName: ".env")];
+  var initJobs = <Future>[initDIContainer()];
   Future.wait(initJobs).then((value) {
     runApp(const MyApp());
   });

@@ -35,13 +35,17 @@ class SessionManagerModel extends BaseModel {
       templates = value;
       notifyListeners();
     });
-    _worldInstanceRepository.fetchInstances(_userRepository.user?.id).then((value) {
-      instances = value;
-      notifyListeners();
-    });
+    fetchRunningInstances();
     selectedTemplate = null;
     loadConfigs().then((value) {
       savedConfigs = value;
+      notifyListeners();
+    });
+  }
+
+  void fetchRunningInstances() {
+    _worldInstanceRepository.fetchInstances(_userRepository.user?.id).then((value) {
+      instances = value;
       notifyListeners();
     });
   }
@@ -70,7 +74,11 @@ class SessionManagerModel extends BaseModel {
 
   void onDeleteVerse(SubWorldInstance subWorldInstance) {
     if (_processes.containsKey(subWorldInstance.id)) {
-      _processes[subWorldInstance.id]?.kill();
+      if (_processes[subWorldInstance.id] != null) {
+        print("Found it, the one with id: ${subWorldInstance.id}");
+      }
+      var res = _processes[subWorldInstance.id]?.kill();
+      print(res);
     }
     _processes.removeWhere((key, value) => key == subWorldInstance.id);
     _worldInstanceRepository.deleteInstance(subWorldInstance).then((value) {
@@ -116,22 +124,12 @@ class SessionManagerModel extends BaseModel {
           "-ImageUrl=${selectedTemplate!.thumbnail_centralized_uri}",
           "-InstanceId=${createdInstanceId.toString()}",
           "-TemplateId=${selectedTemplate!.id.toString()}",
-          "-ini:Engine:[EpicOnlineServices]:DedicatedServerClientId=${dotenv.env['EpicServerClientId']}",
-          "-ini:Engine:[EpicOnlineServices]:DedicatedServerClientSecret=${dotenv.env['EpicServerClientSecret']}",
-          "-ini:Engine:[EpicOnlineServices]:DedicatedServerPrivateKey=${dotenv.env['EpicServerPrivateKey']}"
               "&"
         ],
-        runInShell: true);
+        runInShell: true,
+    );
     _processes[createdInstanceId] = process;
     process.stdout.transform(utf8.decoder).forEach((element) {
-      // print(element);
-      // if (element.contains("Successfully")) {
-      //   print("got here");
-      //   var tokens = element.replaceAll("'", "").split(" ");
-      //   var sessionID = tokens.last;
-      //   print(sessionID);
-      //   logsContainer.addLog("Successfully created session '$sessionID'");
-      // }
       if (element.contains("Completed")) {
         notifyListeners();
       }

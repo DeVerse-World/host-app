@@ -296,6 +296,16 @@ class _SessionManagerScreenState extends State<SessionManagerScreen> {
                           _portController.text,
                           _beaconController.text);
                     },
+                  ),
+                  const SizedBox(width: 8,),
+                  IconButton(
+                    onPressed: () {
+                      _model.fetchRunningInstances();
+                    },
+                    icon: Icon(
+                      FluentIcons.refresh,
+                      color: Colors.red,
+                    ),
                   )
                 ],
               ),
