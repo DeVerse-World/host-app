@@ -1,10 +1,11 @@
+import 'package:deverse_host_app/data/api/response_body.dart';
+import 'package:deverse_host_app/data/api/result.dart';
+import 'package:deverse_host_app/data/db/app_storage.dart';
+import 'package:deverse_host_app/repositories/user_repository.dart';
+import 'package:deverse_host_app/utils/injection_container.dart';
 import 'package:flutter/material.dart';
 
-import '../../data/api/response_body.dart';
-import '../../data/api/result.dart';
-import '../../data/db/app_storage.dart';
-import '../../repositories/user_repository.dart';
-import '../../utils/injection_container.dart';
+
 
 class SettingsModel extends ChangeNotifier {
   final UserRepository _userRepository = container<UserRepository>();

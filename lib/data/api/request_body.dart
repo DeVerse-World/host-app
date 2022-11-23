@@ -1,8 +1,8 @@
+import 'package:deverse_host_app/data/models/world_instance_config.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 import '../models/sub_world_instance.dart';
 import '../models/sub_world_template.dart';
-import '../models/world_instance_config.dart';
 
 part 'request_body.g.dart';
 
